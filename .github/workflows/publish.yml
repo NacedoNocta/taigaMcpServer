@@ -33,6 +33,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     name: 📦 Publish to NPM
+    permissions:
+      contents: read
+      packages: read
     
     steps:
       - name: 📥 Checkout code
@@ -57,47 +60,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
-      - name: 🎉 Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ steps.get_version.outputs.VERSION }}
-          body: |
-            ## 🚀 Release ${{ steps.get_version.outputs.VERSION }}
-            
-            ### 📦 Package Installation
-            
-            **NPM Registry:**
-            ```bash
-            npm install taiga-mcp-server@${{ steps.get_version.outputs.VERSION }}
-            npx taiga-mcp-server
-            ```
-            
-            **GitHub Package Registry:**
-            ```bash
-            npm install @greddy7574/taiga-mcp-server@${{ steps.get_version.outputs.VERSION }}
-            npx @greddy7574/taiga-mcp-server
-            ```
-            
-            ### ✨ Features
-            - 13 MCP tools across 6 functional categories
-            - Complete Sprint and Issue management  
-            - Modular ES6 architecture
-            - Professional testing framework
-            
-            ### 🛠️ Technical Stack
-            - Node.js ES modules
-            - MCP protocol over stdio
-            - Comprehensive test coverage
-            - AI-assisted development
-            
-            ---
-            **Created by:** Greddy (greddy7574@gmail.com)  
-            **AI Development Partner:** Claude Code
-          draft: false
-          prerelease: false
 
   publish-gpr:
     needs: test
@@ -138,3 +100,75 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  create-release:
+    needs: [publish, publish-gpr]
+    runs-on: ubuntu-latest
+    name: 🎉 Create GitHub Release
+    permissions:
+      contents: write
+      pull-requests: read
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: 🏷️ Extract version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        
+      - name: 📝 Generate Release Notes
+        id: release_notes
+        run: |
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "## 🚀 Release v${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### 📦 Package Installation" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "**NPM Registry:**" >> $GITHUB_OUTPUT
+          echo "\`\`\`bash" >> $GITHUB_OUTPUT
+          echo "npm install taiga-mcp-server@${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+          echo "npx taiga-mcp-server" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "**GitHub Package Registry:**" >> $GITHUB_OUTPUT
+          echo "\`\`\`bash" >> $GITHUB_OUTPUT
+          echo "npm install @greddy7574/taiga-mcp-server@${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+          echo "npx @greddy7574/taiga-mcp-server" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### 📋 What's Changed" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD~1)..HEAD >> $GITHUB_OUTPUT || echo "- Initial release" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### ✨ Core Features" >> $GITHUB_OUTPUT
+          echo "- 13 MCP tools across 6 functional categories" >> $GITHUB_OUTPUT
+          echo "- Complete Sprint and Issue management" >> $GITHUB_OUTPUT
+          echo "- Modular ES6 architecture" >> $GITHUB_OUTPUT
+          echo "- Professional testing framework" >> $GITHUB_OUTPUT
+          echo "- Automated dual registry publishing" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### 🛠️ Technical Stack" >> $GITHUB_OUTPUT
+          echo "- Node.js ES modules" >> $GITHUB_OUTPUT
+          echo "- MCP protocol over stdio" >> $GITHUB_OUTPUT
+          echo "- GitHub Actions automation" >> $GITHUB_OUTPUT
+          echo "- NPM + GitHub Package Registry" >> $GITHUB_OUTPUT
+          echo "- Comprehensive test coverage" >> $GITHUB_OUTPUT
+          echo "- AI-assisted development" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "---" >> $GITHUB_OUTPUT
+          echo "**Created by:** Greddy (greddy7574@gmail.com)" >> $GITHUB_OUTPUT
+          echo "**AI Development Partner:** Claude Code" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        
+      - name: 🎉 Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release v${{ steps.get_version.outputs.VERSION }}
+          body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
