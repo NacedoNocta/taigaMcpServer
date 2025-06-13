@@ -1,7 +1,0 @@
-172e75d Add comprehensive documentation and update environment examples
-2a3b25e Major project restructure and repository migration
-8d1c6ee Update README.md
-a22a60a Add configuration examples for taiga-mcp in README.md
-bd623f1 Update README.md to include OPENAI_API_KEY setup instructions and usage details
-37014ff Add initial project setup with environment configuration and test clients
-3a0375e Initial commit with .gitignore and .env.example
