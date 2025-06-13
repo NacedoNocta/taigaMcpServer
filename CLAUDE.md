@@ -232,3 +232,20 @@ git push origin main --tags    # 推送触发CI/CD
 - **文档完善**: 专业级文档和指南
 
 项目是"inspired by"开源项目的成功案例，展现了如何在保持法律合规的同时进行大幅创新和改进。
+
+## 📚 扩展文档
+
+**完整的技术文档和用户指南请访问项目 Wiki:**
+👉 **https://github.com/greddy7574/taigaMcpServer/wiki**
+
+### Wiki 亮点功能
+- 🔍 **全文搜索** - 快速查找特定内容
+- 📱 **移动优化** - 更好的移动设备体验  
+- 🔗 **智能导航** - 页面间快速跳转
+- 📖 **在线编辑** - 协作编辑文档
+- 📊 **富媒体支持** - 图表、表格、代码高亮
+
+### 推荐阅读顺序
+1. [Installation Guide](https://github.com/greddy7574/taigaMcpServer/wiki/Installation-Guide) - 新用户必读
+2. [API Reference](https://github.com/greddy7574/taigaMcpServer/wiki/API-Reference) - 完整API文档
+3. [CICD Automation](https://github.com/greddy7574/taigaMcpServer/wiki/CICD-Automation) - 自动化发布流程

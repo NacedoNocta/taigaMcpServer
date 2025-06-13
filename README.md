@@ -179,17 +179,20 @@ This reimplementation acknowledges the foundational concept while showcasing the
 
 ## 📚 Documentation
 
-For comprehensive documentation:
+**完整文档请访问我们的 [GitHub Wiki](https://github.com/greddy7574/taigaMcpServer/wiki) 📖**
 
-- **[📋 Complete API Reference](./docs/API.md)** - Detailed guide for all 13 MCP tools
-- **[🏗️ Architecture & Design](./docs/DESIGN.md)** - System design and technical decisions  
-- **[🚀 CI/CD Automation Guide](./docs/CICD.md)** - Automated publishing workflow
-- **[📚 Documentation Center](./docs/README.md)** - Full documentation index
+### 🎯 快速导航
+- **[📖 Wiki 首页](https://github.com/greddy7574/taigaMcpServer/wiki)** - 完整文档中心
+- **[⚡ 安装指南](https://github.com/greddy7574/taigaMcpServer/wiki/Installation-Guide)** - 快速开始
+- **[📋 API 参考](https://github.com/greddy7574/taigaMcpServer/wiki/API-Reference)** - 13个 MCP 工具详解
+- **[🚀 CI/CD 指南](https://github.com/greddy7574/taigaMcpServer/wiki/CICD-Automation)** - 自动化发布流程
 
-### Developer Resources
-- **[Development Guide](./CLAUDE.md)** - Complete setup and development workflow
-- **[Testing Framework](./test/README.md)** - Testing strategy and execution
-- **[GitHub Actions](./.github/workflows/publish.yml)** - Automated CI/CD configuration
+### 👩‍💻 开发者资源
+- **[🛠️ 开发环境](https://github.com/greddy7574/taigaMcpServer/wiki/Development-Setup)** - 本地开发配置
+- **[🧪 测试框架](https://github.com/greddy7574/taigaMcpServer/wiki/Testing-Framework)** - 测试策略指南
+- **[🏗️ 架构设计](https://github.com/greddy7574/taigaMcpServer/wiki/Architecture-Design)** - 系统设计文档
+
+> 💡 **提示**: Wiki 提供更好的搜索、导航和移动端体验！
 
 ## 🚀 Automated Publishing
 
