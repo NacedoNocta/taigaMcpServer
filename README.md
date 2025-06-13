@@ -40,13 +40,21 @@ A powerful **Model Context Protocol (MCP)** server that enables natural language
 No installation required - runs latest version automatically:
 
 ```bash
+# NPM Registry (official)
 npx taiga-mcp-server
+
+# GitHub Package Registry (alternative)
+npx @greddy7574/taiga-mcp-server
 ```
 
 ### Option 2: Global Installation
 ```bash
+# From NPM Registry
 npm install -g taiga-mcp-server
 taiga-mcp
+
+# From GitHub Packages
+npm install -g @greddy7574/taiga-mcp-server
 ```
 
 ## ⚙️ Configuration
@@ -168,6 +176,33 @@ From the original basic concept, this version expanded to include:
 **This implementation**: Full-featured Taiga project management suite with entirely new architecture
 
 This reimplementation acknowledges the foundational concept while showcasing the collaborative potential of AI-assisted software development.
+
+## 📚 Documentation
+
+For comprehensive documentation:
+
+- **[📋 Complete API Reference](./docs/API.md)** - Detailed guide for all 13 MCP tools
+- **[🏗️ Architecture & Design](./docs/DESIGN.md)** - System design and technical decisions  
+- **[🚀 CI/CD Automation Guide](./docs/CICD.md)** - Automated publishing workflow
+- **[📚 Documentation Center](./docs/README.md)** - Full documentation index
+
+### Developer Resources
+- **[Development Guide](./CLAUDE.md)** - Complete setup and development workflow
+- **[Testing Framework](./test/README.md)** - Testing strategy and execution
+- **[GitHub Actions](./.github/workflows/publish.yml)** - Automated CI/CD configuration
+
+## 🚀 Automated Publishing
+
+This project features a fully automated CI/CD pipeline:
+
+```bash
+npm version patch              # Create new version
+git push origin main --tags    # Trigger automated publishing
+```
+
+**Automated Flow**: Tests → NPM Publish → GitHub Packages → Release Creation  
+**Dual Registry Support**: Available on both NPM and GitHub Package Registry  
+**Full Documentation**: See [CI/CD Guide](./docs/CICD.md) for complete setup
 
 ## 🤝 Contributing
 

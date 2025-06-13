@@ -26,10 +26,18 @@ npm run test:integration    # 运行Taiga API集成测试（需凭据）
 npm run test:full          # 运行所有测试套件
 ```
 
-### 包管理
+### 包管理与发布
 ```bash
+# 手动发布（不推荐）
 npm publish                 # 发布到npm（需要版本更新）
-npx taiga-mcp-server       # 全局运行最新版本
+
+# 自动化发布（推荐）
+npm version patch           # 创建新版本并触发自动发布
+git push origin main --tags # 推送标签，触发CI/CD自动发布
+
+# 使用已发布的包
+npx taiga-mcp-server                     # NPM Registry
+npx @greddy7574/taiga-mcp-server        # GitHub Package Registry
 ```
 
 ## ⚙️ 环境配置
@@ -159,7 +167,29 @@ return createErrorResponse(ERROR_MESSAGES.PROJECT_NOT_FOUND);
 1. **快速验证**: `npm test` (单元+快速测试)
 2. **功能开发**: 修改对应工具模块
 3. **完整测试**: `npm run test:full`
-4. **版本发布**: 更新version → `npm publish`
+4. **自动发布**: `npm version patch && git push origin main --tags`
+
+### CI/CD自动化流程 🚀
+项目配置了完整的GitHub Actions自动化发布流程：
+
+**触发条件**: 推送 `v*` 标签
+```bash
+npm version patch              # 自动创建新版本标签
+git push origin main --tags    # 推送触发CI/CD
+```
+
+**自动化流程**:
+1. **🧪 测试阶段** - 运行单元测试和快速测试
+2. **📦 并行发布**:
+   - NPM Registry: `taiga-mcp-server`
+   - GitHub Packages: `@greddy7574/taiga-mcp-server`
+3. **🎉 Release创建** - 自动生成changelog和发布说明
+
+**配置要求**:
+- GitHub Repository Secret: `NPM_TOKEN` (npm自动化token)
+- 权限: `contents: write`, `packages: write`
+
+**完整流程耗时**: ~45秒 (测试→发布→Release)
 
 ## 🎯 常见开发任务
 
@@ -188,6 +218,11 @@ return createErrorResponse(ERROR_MESSAGES.PROJECT_NOT_FOUND);
 - **v1.4.0**: 增强常量管理，统一命名
 - **v1.5.0**: 完全模块化架构
 - **v1.5.1**: 清理和测试框架
+- **v1.5.2**: 清理git历史，完整npm发布
+- **v1.5.3**: CI/CD基础框架
+- **v1.5.4**: 修复CI/CD流程
+- **v1.5.5**: 双重发布支持(NPM+GPR)
+- **v1.5.6**: 完全自动化Release创建
 
 ### AI协作开发特色
 这个项目展示了人机协作开发的强大潜力：

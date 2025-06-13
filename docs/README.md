@@ -4,6 +4,14 @@
 
 ## 📋 文档导航
 
+### 🚀 [CI/CD自动化指南 (CICD.md)](./CICD.md)
+**完整的自动化发布流程文档**
+- GitHub Actions工作流配置
+- 双重发布支持 (NPM + GitHub Packages)
+- 自动Release创建和changelog生成
+- 配置要求和故障排除
+- 性能指标和最佳实践
+
 ### 🏗️ [设计文档 (DESIGN.md)](./DESIGN.md)
 **完整的系统设计和架构思考**
 - 项目定位和价值主张
