@@ -1,4 +1,4 @@
-name: 🚀 Publish to NPM
+name: 🚀 Publish to NPM & GitHub Packages
 
 on:
   push:
@@ -67,10 +67,18 @@ jobs:
           body: |
             ## 🚀 Release ${{ steps.get_version.outputs.VERSION }}
             
-            ### 📦 NPM Package
+            ### 📦 Package Installation
+            
+            **NPM Registry:**
             ```bash
             npm install taiga-mcp-server@${{ steps.get_version.outputs.VERSION }}
             npx taiga-mcp-server
+            ```
+            
+            **GitHub Package Registry:**
+            ```bash
+            npm install @greddy7574/taiga-mcp-server@${{ steps.get_version.outputs.VERSION }}
+            npx @greddy7574/taiga-mcp-server
             ```
             
             ### ✨ Features
@@ -90,3 +98,43 @@ jobs:
             **AI Development Partner:** Claude Code
           draft: false
           prerelease: false
+
+  publish-gpr:
+    needs: test
+    runs-on: ubuntu-latest
+    name: 📦 Publish to GitHub Packages
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js for GPR
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@greddy7574'
+          cache: 'npm'
+          
+      - name: 📋 Install dependencies
+        run: npm ci
+        
+      - name: 🏷️ Extract version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        
+      - name: 📝 Create scoped package.json for GPR
+        run: |
+          jq '.name = "@greddy7574/taiga-mcp-server"' package.json > package-gpr.json
+          mv package-gpr.json package.json
+        
+      - name: 📝 Create .npmrc for GitHub Packages
+        run: echo "@greddy7574:registry=https://npm.pkg.github.com" > .npmrc
+        
+      - name: 🚀 Publish to GitHub Packages
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
