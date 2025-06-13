@@ -30,3 +30,6 @@ logs
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Wiki repository (managed separately)
+docs/
