@@ -40,6 +40,23 @@ npx taiga-mcp-server                     # NPM Registry
 npx @greddy7574/taiga-mcp-server        # GitHub Package Registry
 ```
 
+### Docker 部署
+```bash
+# 构建镜像
+docker build -t taiga-mcp-server .
+
+# 运行容器（需要 .env 文件）
+docker run --rm -i --env-file .env taiga-mcp-server
+
+# 使用 docker-compose
+docker-compose up --build        # 生产环境
+docker-compose --profile dev up  # 开发环境（包含测试）
+
+# 清理
+docker-compose down
+docker system prune -f
+```
+
 ### Wiki 文档同步
 ```bash
 # Wiki 推送流程（docs 文件夹直接关联到 Wiki 仓库）
@@ -70,6 +87,8 @@ TAIGA_PASSWORD=your_password
 ```
 
 ### Claude Desktop配置
+
+#### NPM方式（推荐）
 ```json
 {
   "mcpServers": {
@@ -81,6 +100,42 @@ TAIGA_PASSWORD=your_password
         "TAIGA_USERNAME": "your_username", 
         "TAIGA_PASSWORD": "your_password"
       }
+    }
+  }
+}
+```
+
+#### Docker方式
+```json
+{
+  "mcpServers": {
+    "taiga-mcp": {
+      "command": "docker",
+      "args": [
+        "run", 
+        "--rm", 
+        "-i",
+        "-e", "TAIGA_API_URL=https://api.taiga.io/api/v1",
+        "-e", "TAIGA_USERNAME=your_username",
+        "-e", "TAIGA_PASSWORD=your_password",
+        "taiga-mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+#### Docker Compose方式
+```json
+{
+  "mcpServers": {
+    "taiga-mcp": {
+      "command": "docker-compose",
+      "args": [
+        "-f", "/path/to/taigaMcpServer/docker-compose.yml",
+        "run", "--rm", "taiga-mcp-server"
+      ],
+      "cwd": "/path/to/taigaMcpServer"
     }
   }
 }

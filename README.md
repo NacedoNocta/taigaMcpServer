@@ -57,10 +57,30 @@ taiga-mcp
 npm install -g @greddy7574/taiga-mcp-server
 ```
 
+### Option 3: Docker Deployment
+```bash
+# Build the image
+docker build -t taiga-mcp-server .
+
+# Run with environment file
+docker run --rm -i --env-file .env taiga-mcp-server
+
+# Or with environment variables
+docker run --rm -i \
+  -e TAIGA_API_URL=https://api.taiga.io/api/v1 \
+  -e TAIGA_USERNAME=your_username \
+  -e TAIGA_PASSWORD=your_password \
+  taiga-mcp-server
+
+# Using docker-compose
+docker-compose up --build
+```
+
 ## ⚙️ Configuration
 
 ### Claude Desktop Integration
 
+#### NPX Method (Recommended)
 Add to your Claude Desktop `config.json`:
 
 ```json
@@ -74,6 +94,42 @@ Add to your Claude Desktop `config.json`:
         "TAIGA_USERNAME": "your_username",
         "TAIGA_PASSWORD": "your_password"
       }
+    }
+  }
+}
+```
+
+#### Docker Method
+```json
+{
+  "mcpServers": {
+    "taiga-mcp": {
+      "command": "docker",
+      "args": [
+        "run", 
+        "--rm", 
+        "-i",
+        "-e", "TAIGA_API_URL=https://api.taiga.io/api/v1",
+        "-e", "TAIGA_USERNAME=your_username",
+        "-e", "TAIGA_PASSWORD=your_password",
+        "taiga-mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+#### Docker Compose Method
+```json
+{
+  "mcpServers": {
+    "taiga-mcp": {
+      "command": "docker-compose",
+      "args": [
+        "-f", "/path/to/project/docker-compose.yml",
+        "run", "--rm", "taiga-mcp-server"
+      ],
+      "cwd": "/path/to/project"
     }
   }
 }
