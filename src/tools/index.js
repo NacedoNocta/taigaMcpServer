@@ -10,6 +10,7 @@ import { listUserStoriesTool, createUserStoryTool } from './userStoryTools.js';
 import { createTaskTool } from './taskTools.js';
 import { listIssuesTool, getIssueTool, createIssueTool } from './issueTools.js';
 import { listSprintsTool, getSprintStatsTool, createSprintTool, getIssuesBySprintTool } from './sprintTools.js';
+import { batchCreateIssuesTool, batchCreateUserStoriesTool, batchCreateTasksTool } from './batchTools.js';
 
 /**
  * Registry of all available MCP tools
@@ -51,6 +52,13 @@ export const toolRegistry = {
     getSprintStatsTool,
     createSprintTool,
     getIssuesBySprintTool
+  ],
+  
+  // Batch operation tools
+  batch: [
+    batchCreateIssuesTool,
+    batchCreateUserStoriesTool,
+    batchCreateTasksTool
   ]
 };
 

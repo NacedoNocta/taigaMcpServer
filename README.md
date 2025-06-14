@@ -23,6 +23,13 @@ A powerful **Model Context Protocol (MCP)** server that enables natural language
 - Track sprint progress with completion statistics
 - Real-time status updates and progress monitoring
 
+### 🚀 Batch Operations (NEW!)
+- **Batch Create Issues**: Create multiple issues in one operation (up to 20)
+- **Batch Create User Stories**: Bulk create user stories with story points
+- **Batch Create Tasks**: Mass create tasks for specific user stories
+- **Smart Error Handling**: Individual failures don't affect other items
+- **Detailed Reporting**: Success/failure status for each item
+
 ### 💬 Natural Language Interface
 - **"List all projects"**
 - **"Show me Sprint 5 progress statistics"**
@@ -181,6 +188,24 @@ For self-hosted Taiga instances:
 
 🗣️ "List all user stories in project MyApp"
 📝 Returns: User stories with status and assignments
+
+🗣️ "Create these 5 issues in batch: Bug1, Bug2, Feature1, Task1, Task2"
+🚀 Returns: Batch creation results with individual success/failure status
+```
+
+### Batch Operations Examples
+```
+🗣️ "Batch create these issues in MyApp:
+- Bug: Login page broken (High priority)
+- Feature: Add search functionality (Medium priority) 
+- Task: Update documentation (Low priority)"
+📊 Returns: Created 3/3 issues successfully with reference numbers
+
+🗣️ "Batch create user stories:
+- User registration flow (5 points)
+- Password reset feature (3 points)
+- Email notifications (2 points)"
+📋 Returns: Created 3/3 user stories with story point assignments
 ```
 
 ## 🔧 Available Tools
@@ -199,6 +224,9 @@ For self-hosted Taiga instances:
 | `getIssuesByMilestone` | View all issues in a sprint |
 | `createIssue` | Create issues with priorities/types |
 | `createTask` | Create tasks linked to user stories |
+| `batchCreateIssues` | **NEW!** Batch create multiple issues (up to 20) |
+| `batchCreateUserStories` | **NEW!** Batch create multiple user stories |
+| `batchCreateTasks` | **NEW!** Batch create multiple tasks for a user story |
 
 ## 🚀 Why Choose Taiga MCP Server?
 
@@ -206,8 +234,9 @@ For self-hosted Taiga instances:
 - **🧠 AI-Native**: Built specifically for conversational project management
 - **🔗 Complete Integration**: Full Taiga API coverage
 - **📊 Rich Data**: Detailed progress tracking and statistics
-- **🎯 Sprint-Focused**: Advanced sprint-issue relationship tracking
+- **🎯 Sprint-Focused**: Advanced sprint-issue relationship tracking  
 - **🛡️ Secure**: Environment-based credential management
+- **🚀 Batch Operations**: Efficient bulk operations for large projects
 
 ## 🙏 Acknowledgments
 

@@ -41,6 +41,17 @@ export const SUCCESS_MESSAGES = {
   SPRINT_CREATED: 'Sprint created successfully!',
 };
 
+export const BATCH_OPERATIONS = {
+  MAX_BATCH_SIZE: 20,
+  ERROR_EMPTY_BATCH: 'Batch array cannot be empty',
+  ERROR_BATCH_TOO_LARGE: 'Batch size exceeds maximum limit',
+  SUCCESS_BATCH_CREATED_ISSUES: '🚀 批次Issues創建完成',
+  SUCCESS_BATCH_CREATED_STORIES: '🚀 批次User Stories創建完成', 
+  SUCCESS_BATCH_CREATED_TASKS: '🚀 批次Tasks創建完成',
+  BATCH_OPERATION_START: '開始批次操作...',
+  BATCH_OPERATION_COMPLETE: '批次操作完成！',
+};
+
 export const API_ENDPOINTS = {
   PROJECTS: '/projects',
   USER_STORIES: '/userstories',
