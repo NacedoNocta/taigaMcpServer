@@ -179,20 +179,34 @@ This reimplementation acknowledges the foundational concept while showcasing the
 
 ## 📚 Documentation
 
-**完整文档请访问我们的 [GitHub Wiki](https://github.com/greddy7574/taigaMcpServer/wiki) 📖**
+**Complete documentation is available on our [GitHub Wiki](https://github.com/greddy7574/taigaMcpServer/wiki) 📖**
 
-### 🎯 快速导航
-- **[📖 Wiki 首页](https://github.com/greddy7574/taigaMcpServer/wiki)** - 完整文档中心
-- **[⚡ 安装指南](https://github.com/greddy7574/taigaMcpServer/wiki/Installation-Guide)** - 快速开始
-- **[📋 API 参考](https://github.com/greddy7574/taigaMcpServer/wiki/API-Reference)** - 13个 MCP 工具详解
-- **[🚀 CI/CD 指南](https://github.com/greddy7574/taigaMcpServer/wiki/CICD-Automation)** - 自动化发布流程
+### 🌐 Multi-Language Support
 
-### 👩‍💻 开发者资源
-- **[🛠️ 开发环境](https://github.com/greddy7574/taigaMcpServer/wiki/Development-Setup)** - 本地开发配置
-- **[🧪 测试框架](https://github.com/greddy7574/taigaMcpServer/wiki/Testing-Framework)** - 测试策略指南
-- **[🏗️ 架构设计](https://github.com/greddy7574/taigaMcpServer/wiki/Architecture-Design)** - 系统设计文档
+Our documentation is available in three languages:
 
-> 💡 **提示**: Wiki 提供更好的搜索、导航和移动端体验！
+- **🇺🇸 [English](https://github.com/greddy7574/taigaMcpServer/wiki/Home.en)** - Complete English documentation
+- **🇨🇳 [简体中文](https://github.com/greddy7574/taigaMcpServer/wiki/Home.zh-CN)** - 完整的简体中文文档
+- **🇹🇼 [繁體中文](https://github.com/greddy7574/taigaMcpServer/wiki/Home.zh-TW)** - 完整的繁體中文文件
+
+### 🎯 Quick Navigation
+
+| Section | English                                                                               | 简体中文                                                                              | 繁體中文                                                                            |
+|---------|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| **Getting Started** | [Installation Guide](https://github.com/greddy7574/taigaMcpServer/wiki/Installation.en) | [安装指南](https://github.com/greddy7574/taigaMcpServer/wiki/Installation.zh-CN)      | [安裝指南](https://github.com/greddy7574/taigaMcpServer/wiki/Installation.zh-TW)    |
+| **API Reference** | [API Reference](https://github.com/greddy7574/taigaMcpServer/wiki/API-Reference.en)   | [API 参考](https://github.com/greddy7574/taigaMcpServer/wiki/API-Reference.zh-CN)   | [API 參考](https://github.com/greddy7574/taigaMcpServer/wiki/API-Reference.zh-TW) |
+| **Architecture** | [Architecture](https://github.com/greddy7574/taigaMcpServer/wiki/ARCHITECTURE.en)   | [架构概览](https://github.com/greddy7574/taigaMcpServer/wiki/ARCHITECTURE.zh-CN) | [架構概覽](https://github.com/greddy7574/taigaMcpServer/wiki/ARCHITECTURE.zh-TW)    |
+| **CI/CD Guide** | [CI/CD Guide](https://github.com/greddy7574/taigaMcpServer/wiki/CICD.en)            | [CI/CD 指南](https://github.com/greddy7574/taigaMcpServer/wiki/CICD.zh-CN)          | [CI/CD 指南](https://github.com/greddy7574/taigaMcpServer/wiki/CICD.zh-TW)        |
+
+### 👩‍💻 Developer Resources
+
+| Topic | English                                                                             | 简体中文                                                                       | 繁體中文                                                                       |
+|-------|-------------------------------------------------------------------------------------|----------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| **Design Document** | [Design](https://github.com/greddy7574/taigaMcpServer/wiki/DESIGN.en)               | [设计文档](https://github.com/greddy7574/taigaMcpServer/wiki/DESIGN.zh-CN)     | [設計文件](https://github.com/greddy7574/taigaMcpServer/wiki/DESIGN.zh-TW)     |
+| **First Steps** | [First Steps](https://github.com/greddy7574/taigaMcpServer/wiki/First-Steps.en)     | [第一步](https://github.com/greddy7574/taigaMcpServer/wiki/First-Steps.zh-CN) | [第一步](https://github.com/greddy7574/taigaMcpServer/wiki/First-Steps.zh-TW) |
+| **Configuration** | [Configuration](https://github.com/greddy7574/taigaMcpServer/wiki/Configuration.en) | [配置说明](https://github.com/greddy7574/taigaMcpServer/wiki/Configuration.zh-CN)   | [設定說明](https://github.com/greddy7574/taigaMcpServer/wiki/Configuration.zh-TW)   |
+
+> 💡 **Tip**: The Wiki provides better search, navigation, and mobile experience!
 
 ## 🚀 Automated Publishing
 
@@ -205,7 +219,7 @@ git push origin main --tags    # Trigger automated publishing
 
 **Automated Flow**: Tests → NPM Publish → GitHub Packages → Release Creation  
 **Dual Registry Support**: Available on both NPM and GitHub Package Registry  
-**Full Documentation**: See [CI/CD Guide](./docs/CICD.md) for complete setup
+**Full Documentation**: See [CI/CD Guide](https://github.com/greddy7574/taigaMcpServer/wiki/CICD.en) for complete setup
 
 ## 🤝 Contributing
 

@@ -1,133 +1,64 @@
-# 🚀 Taiga MCP Server
+# 🚀 Taiga MCP Server Wiki
 
-**完整的 Taiga 项目管理 MCP 服务器，支持 Sprint 管理、Issue 追踪和自动化发布**
+Welcome to the complete documentation center for Taiga MCP Server!
 
-[![NPM Version](https://img.shields.io/npm/v/taiga-mcp-server)](https://www.npmjs.com/package/taiga-mcp-server)
-[![GitHub Release](https://img.shields.io/github/v/release/greddy7574/taigaMcpServer)](https://github.com/greddy7574/taigaMcpServer/releases)
-[![CI/CD Status](https://img.shields.io/github/actions/workflow/status/greddy7574/taigaMcpServer/publish.yml)](https://github.com/greddy7574/taigaMcpServer/actions)
+## 🌐 Choose Your Language
 
-## ⚡ 快速开始
+### 🇺🇸 English
+**Complete English documentation covering installation, configuration, and usage guides**
 
-### 立即使用
-```bash
-# NPM Registry (推荐)
-npx taiga-mcp-server
+[![English](https://img.shields.io/badge/Docs-English-blue?style=for-the-badge)](Home.en)
 
-# GitHub Package Registry
-npx @greddy7574/taiga-mcp-server
-```
+### 🇨🇳 简体中文 (Simplified Chinese)
+**完整的中文文档，涵盖安装、配置和使用指南**
 
-### Claude Desktop 集成
-```json
-{
-  "mcpServers": {
-    "taiga-mcp": {
-      "command": "npx",
-      "args": ["taiga-mcp-server"],
-      "env": {
-        "TAIGA_API_URL": "https://api.taiga.io/api/v1",
-        "TAIGA_USERNAME": "your_username",
-        "TAIGA_PASSWORD": "your_password"
-      }
-    }
-  }
-}
-```
+[![简体中文](https://img.shields.io/badge/文档-简体中文-red?style=for-the-badge)](Home.zh-CN)
 
-## 📚 核心文档
+### 🇹🇼 繁體中文 (Traditional Chinese)  
+**完整的繁體中文文件，涵蓋安裝、設定和使用指南**
 
-### 🎯 用户指南
-- **[[安装指南|Installation-Guide]]** - 详细的安装和配置步骤
-- **[[配置说明|Configuration]]** - 环境变量和高级设置
-- **[[第一步|First-Steps]]** - 快速上手和基本使用
-
-### 🛠️ 技术文档
-- **[[API 参考|API-Reference]]** - 13个 MCP 工具的完整文档
-- **[[CI/CD 指南|CI-CD-Guide]]** - 完整的自动化发布流程
-- **[[架构概览|Architecture-Overview]]** - 系统设计和技术决策
-
-### 👩‍💻 开发指南
-- **[[开发环境|Development-Setup]]** - 本地开发环境配置
-- **[[测试框架|Testing-Framework]]** - 测试策略和执行指南
-- **[[故障排除|Troubleshooting]]** - 常见问题解决方案
-
-## ✨ 核心特性
-
-### 🏃 Sprint 管理
-- 创建和管理 Sprint (里程碑)
-- 实时统计和进度追踪
-- Sprint 中的 Issue 关联查看
-
-### 🐛 Issue 追踪  
-- 完整的 Issue 生命周期管理
-- Sprint 分配和状态追踪
-- 高级搜索和过滤
-
-### 📝 项目管理
-- 多项目支持 (ID/slug/名称灵活识别)
-- 用户故事和任务管理
-- 团队协作功能
-
-### 🚀 自动化发布
-- 双重注册表发布 (NPM + GitHub Packages)
-- 完全自动化的 CI/CD 流程
-- 自动版本管理和 Release 创建
-
-## 🏗️ 技术架构
-
-### 模块化设计
-```
-src/
-├── index.js          # MCP 服务器主入口
-├── constants.js      # 统一常量管理
-├── utils.js          # 工具函数库
-├── taigaAuth.js      # 认证管理
-├── taigaService.js   # API 服务层
-└── tools/            # 13个 MCP 工具模块
-    ├── authTools.js     # 认证工具
-    ├── projectTools.js  # 项目管理
-    ├── sprintTools.js   # Sprint 管理
-    ├── issueTools.js    # Issue 管理
-    ├── userStoryTools.js # 用户故事
-    └── taskTools.js     # 任务管理
-```
-
-### 测试体系
-- **单元测试**: 11个测试 (100% 通过率)
-- **快速测试**: MCP 协议集成测试
-- **集成测试**: Taiga API 完整测试
-- **CI/CD 测试**: 自动化发布流程验证
-
-## 📊 项目统计
-
-| 指标 | 数值 |
-|------|------|
-| MCP 工具 | 13个 |
-| 功能分类 | 6个 |
-| 代码行数 | 1800+ |
-| 测试覆盖 | 100% |
-| 发布速度 | ~45秒 |
-| 文档页面 | 15+ |
-
-## 🔗 快速链接
-
-- **[GitHub 仓库](https://github.com/greddy7574/taigaMcpServer)** - 源代码和 Issues
-- **[NPM 包](https://www.npmjs.com/package/taiga-mcp-server)** - 官方发布版本
-- **[GitHub Packages](https://github.com/greddy7574/taigaMcpServer/packages)** - 替代注册表
-- **[Releases](https://github.com/greddy7574/taigaMcpServer/releases)** - 版本历史和更新日志
-- **[CI/CD Actions](https://github.com/greddy7574/taigaMcpServer/actions)** - 自动化构建状态
-
-## 🎯 下一步
-
-1. **新用户**: 从 [[安装指南|Installation-Guide]] 开始
-2. **开发者**: 查看 [[开发环境|Development-Setup]]  
-3. **API 使用**: 参考 [[API 参考|API-Reference]]
-4. **高级配置**: 阅读 [[CI/CD 指南|CI-CD-Guide]]
+[![繁體中文](https://img.shields.io/badge/文件-繁體中文-orange?style=for-the-badge)](Home.zh-TW)
 
 ---
 
-**💡 提示**: 使用 Wiki 顶部的搜索功能快速查找特定内容！
+## 📚 Quick Navigation
 
-**🔄 更新时间**: 2024-06-14 01:22 (测试 Wiki 自动同步功能)
+### 🎯 Getting Started
+| English                                     | 简体中文                             | 繁體中文                             |
+|---------------------------------------------|----------------------------------|----------------------------------|
+| [Installation Guide](Installation-Guide.en) | [安装指南](Installation-Guide.zh-CN) | [安裝指南](Installation-Guide.zh-TW) |
+| [First Steps](First-Steps.en)               | [第一步](First-Steps.zh-CN)         | [第一步](First-Steps.zh-TW)         |
+| [Configuration](Configuration.en)           | [配置说明](Configuration.zh-CN)      | [設定說明](Configuration.zh-TW)      |
+
+### 🛠️ Technical Documentation
+| English                           | 简体中文                          | 繁體中文                          |
+|-----------------------------------|-------------------------------|-------------------------------|
+| [API Reference](API-Reference.en) | [API 参考](API-Reference.zh-CN) | [API 參考](API-Reference.zh-TW) |
+| [Architecture](ARCHITECTURE.en)   | [架构概览](ARCHITECTURE.zh-CN)    | [架構概覽](ARCHITECTURE.zh-TW)    |
+| [CI/CD Guide](CICD.en)            | [CI/CD 指南](CICD.zh-CN)        | [CI/CD 指南](CICD.zh-TW)        |
+| [Design Document](DESIGN.en)      | [设计文档](DESIGN.zh-CN)               | [設計文件](DESIGN.zh-TW)               |
+
+---
+
+## ✨ Project Features
+
+- **🗣️ Natural Language Interface** - Operate Taiga project management through conversation
+- **🏃 Sprint Management** - Complete agile development workflow support
+- **🐛 Issue Tracking** - Powerful issue management and tracking capabilities
+- **🔧 Modular Architecture** - Enterprise-grade scalable design
+- **🧪 Professional Testing** - 100% test coverage ensuring quality
+- **🚀 Automated CI/CD** - Fully automated publishing workflow
+
+---
+
+## 🔗 Project Links
+
+- **[GitHub Repository](https://github.com/greddy7574/taigaMcpServer)** - Source code and Issues
+- **[NPM Package](https://www.npmjs.com/package/taiga-mcp-server)** - Official release version
+- **[Releases](https://github.com/greddy7574/taigaMcpServer/releases)** - Version history and changelog
+
+---
+
+**💡 Tip**: Use the search function at the top of the Wiki to quickly find specific content!
 
 **Created with ❤️ by [Greddy](mailto:greddy7574@gmail.com) & [Claude Code](https://claude.ai/code)**
