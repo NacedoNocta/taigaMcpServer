@@ -240,8 +240,8 @@ DEBUG=true npx taiga-mcp-server
 
 安装完成后，建议：
 
-1. 📖 阅读 [[First Steps|第一步使用]]
-2. 🔍 浏览 [[API Reference|API 参考]]
+1. 📖 阅读 [[First-Steps|第一步使用]]
+2. 🔍 浏览 [[API-Reference|API 参考]]
 3. ⚙️ 查看 [[Configuration|高级配置]]
 
 ---

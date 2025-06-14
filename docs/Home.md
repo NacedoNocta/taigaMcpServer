@@ -37,19 +37,19 @@ npx @greddy7574/taiga-mcp-server
 ## 📚 核心文档
 
 ### 🎯 用户指南
-- **[[Installation Guide|安装指南]]** - 详细的安装和配置步骤
-- **[[Configuration|配置说明]]** - 环境变量和高级设置
-- **[[First Steps|第一步]]** - 快速上手和基本使用
+- **[[安装指南|Installation-Guide]]** - 详细的安装和配置步骤
+- **[[配置说明|Configuration]]** - 环境变量和高级设置
+- **[[第一步|First-Steps]]** - 快速上手和基本使用
 
 ### 🛠️ 技术文档
-- **[[API Reference|API 参考]]** - 13个 MCP 工具的完整文档
-- **[[CI CD Guide|CI/CD 指南]]** - 完整的自动化发布流程
-- **[[Architecture Overview|架构概览]]** - 系统设计和技术决策
+- **[[API 参考|API-Reference]]** - 13个 MCP 工具的完整文档
+- **[[CI/CD 指南|CI-CD-Guide]]** - 完整的自动化发布流程
+- **[[架构概览|Architecture-Overview]]** - 系统设计和技术决策
 
 ### 👩‍💻 开发指南
-- **[[Development Setup|开发环境]]** - 本地开发环境配置
-- **[[Testing Framework|测试框架]]** - 测试策略和执行指南
-- **[[Troubleshooting|故障排除]]** - 常见问题解决方案
+- **[[开发环境|Development-Setup]]** - 本地开发环境配置
+- **[[测试框架|Testing-Framework]]** - 测试策略和执行指南
+- **[[故障排除|Troubleshooting]]** - 常见问题解决方案
 
 ## ✨ 核心特性
 
@@ -119,10 +119,10 @@ src/
 
 ## 🎯 下一步
 
-1. **新用户**: 从 [[Installation Guide|安装指南]] 开始
-2. **开发者**: 查看 [[Development Setup|开发环境]]  
-3. **API 使用**: 参考 [[API Reference|API 参考]]
-4. **高级配置**: 阅读 [[CI CD Guide|CI/CD 指南]]
+1. **新用户**: 从 [[安装指南|Installation-Guide]] 开始
+2. **开发者**: 查看 [[开发环境|Development-Setup]]  
+3. **API 使用**: 参考 [[API 参考|API-Reference]]
+4. **高级配置**: 阅读 [[CI/CD 指南|CI-CD-Guide]]
 
 ---
 
