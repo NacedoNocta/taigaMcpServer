@@ -23,12 +23,19 @@ A powerful **Model Context Protocol (MCP)** server that enables natural language
 - Track sprint progress with completion statistics
 - Real-time status updates and progress monitoring
 
-### 🚀 Batch Operations (NEW!)
+### 🚀 Batch Operations
 - **Batch Create Issues**: Create multiple issues in one operation (up to 20)
 - **Batch Create User Stories**: Bulk create user stories with story points
 - **Batch Create Tasks**: Mass create tasks for specific user stories
 - **Smart Error Handling**: Individual failures don't affect other items
 - **Detailed Reporting**: Success/failure status for each item
+
+### 🔍 Advanced Query Syntax (NEW!)
+- **SQL-like Query Language**: Use `field:operator:value` syntax for precise searches
+- **Logical Operators**: Combine conditions with AND, OR, NOT
+- **Text Matching**: Fuzzy search, wildcards, and substring matching
+- **Date Ranges**: Flexible time-based queries (today, last_week, >7d)
+- **Sorting & Limiting**: ORDER BY and LIMIT clauses for result control
 
 ### 💬 Natural Language Interface
 - **"List all projects"**
@@ -208,6 +215,18 @@ For self-hosted Taiga instances:
 📋 Returns: Created 3/3 user stories with story point assignments
 ```
 
+### Advanced Query Examples
+```
+🗣️ "Find all high priority bugs assigned to john: status:open AND priority:high AND assignee:john AND type:bug"
+📊 Returns: Filtered list of critical bugs needing attention
+
+🗣️ "Show user stories with 5+ points created this week: points:>=5 AND created:this_week ORDER BY points DESC"
+📈 Returns: High-value stories with detailed point breakdown
+
+🗣️ "Search for API-related tasks: subject:contains:\"API\" OR description:contains:\"API\" LIMIT 10"
+🔍 Returns: All tasks mentioning API with relevance ranking
+```
+
 ## 🔧 Available Tools
 
 | Tool | Description |
@@ -216,7 +235,7 @@ For self-hosted Taiga instances:
 | `getProject` | View detailed project information |
 | `listMilestones` | List all sprints in a project |
 | `getMilestoneStats` | Get sprint progress and statistics |
-| `createMilestone` | Create new sprints with dates |
+| `createMilestones` | Create new sprints with dates |
 | `listUserStories` | View user stories in a project |
 | `createUserStory` | Create new user stories |
 | `listIssues` | List issues with sprint info |
@@ -227,6 +246,9 @@ For self-hosted Taiga instances:
 | `batchCreateIssues` | **NEW!** Batch create multiple issues (up to 20) |
 | `batchCreateUserStories` | **NEW!** Batch create multiple user stories |
 | `batchCreateTasks` | **NEW!** Batch create multiple tasks for a user story |
+| `advancedSearch` | **NEW!** Execute advanced SQL-like queries |
+| `queryHelp` | **NEW!** Get query syntax help and examples |
+| `validateQuery` | **NEW!** Validate query syntax before execution |
 
 ## 🚀 Why Choose Taiga MCP Server?
 

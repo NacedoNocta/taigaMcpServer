@@ -11,6 +11,7 @@ import { createTaskTool } from './taskTools.js';
 import { listIssuesTool, getIssueTool, createIssueTool } from './issueTools.js';
 import { listSprintsTool, getSprintStatsTool, createSprintTool, getIssuesBySprintTool } from './sprintTools.js';
 import { batchCreateIssuesTool, batchCreateUserStoriesTool, batchCreateTasksTool } from './batchTools.js';
+import { advancedSearchTool, queryHelpTool, validateQueryTool } from './advancedSearchTools.js';
 
 /**
  * Registry of all available MCP tools
@@ -59,6 +60,13 @@ export const toolRegistry = {
     batchCreateIssuesTool,
     batchCreateUserStoriesTool,
     batchCreateTasksTool
+  ],
+  
+  // Advanced search tools
+  search: [
+    advancedSearchTool,
+    queryHelpTool,
+    validateQueryTool
   ]
 };
 
