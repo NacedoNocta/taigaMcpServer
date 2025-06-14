@@ -1,25 +1,26 @@
 ## 🚀 Taiga MCP Server
 
 ### ⚡ 快速开始
-* [[Home|首页]]
-* [[Installation-Guide|安装指南]]
-* [[Configuration|配置说明]]
-* [[First-Steps|第一步]]
+* [[首页|Home]]
+* [[安装指南|Installation-Guide]]
+* [[配置说明|Configuration]]
+* [[第一步|First-Steps]]
 
 ### 📚 核心文档
-* [[API-Reference|API 参考]]
-* [[CI-CD-Guide|CI/CD 指南]]
-* [[Architecture-Overview|架构概览]]
+* [[API 参考|API-Reference]]
+* [[CI/CD 指南|CICD]]
+* [[架构概览|ARCHITECTURE]]
+* [[设计文档|DESIGN]]
 
 ### 🛠️ 开发指南
-* [[Development-Setup|开发环境]]
-* [[Testing-Framework|测试框架]]
-* [[Troubleshooting|故障排除]]
+* [[开发环境|Development-Setup]]
+* [[测试框架|Testing-Framework]]
+* [[故障排除|Troubleshooting]]
 
 ### 📊 项目信息
-* [[Performance-Metrics|性能指标]]
-* [[Version-History|版本历史]]
-* [[FAQ|常见问题]]
+* [[性能指标|Performance-Metrics]]
+* [[版本历史|Version-History]]
+* [[常见问题|FAQ]]
 
 ---
 
