@@ -42,10 +42,15 @@ Welcome to the complete documentation center for Taiga MCP Server!
 
 ## ✨ Project Features
 
+**🔧 Latest Release: v1.7.0** - Enhanced with 23 MCP tools across 9 categories!
+
 - **🗣️ Natural Language Interface** - Operate Taiga project management through conversation
 - **🏃 Sprint Management** - Complete agile development workflow support
 - **🐛 Issue Tracking** - Powerful issue management and tracking capabilities
-- **🔧 Modular Architecture** - Enterprise-grade scalable design
+- **🚀 Batch Operations** - Create multiple Issues/Stories/Tasks at once (up to 20)
+- **💬 Comment System** - Full discussion support with advanced collaboration features **NEW!**
+- **🔍 Advanced Search** - SQL-style query syntax for complex data filtering **NEW!**
+- **🔧 Modular Architecture** - Enterprise-grade scalable design with 23 tools
 - **🧪 Professional Testing** - 100% test coverage ensuring quality
 - **🚀 Automated CI/CD** - Fully automated publishing workflow
 
