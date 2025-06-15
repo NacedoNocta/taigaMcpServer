@@ -44,6 +44,14 @@ export const ERROR_MESSAGES = {
   ATTACHMENT_NOT_FOUND: 'Attachment not found',
   INVALID_FILE_FORMAT: 'Invalid file format or size',
   FILE_TOO_LARGE: 'File size exceeds maximum limit',
+  FAILED_TO_CREATE_EPIC: 'Failed to create epic in Taiga',
+  FAILED_TO_LIST_EPICS: 'Failed to list epics from Taiga',
+  FAILED_TO_GET_EPIC: 'Failed to get epic details from Taiga',
+  FAILED_TO_UPDATE_EPIC: 'Failed to update epic in Taiga',
+  FAILED_TO_LINK_STORY: 'Failed to link user story to epic',
+  FAILED_TO_UNLINK_STORY: 'Failed to unlink user story from epic',
+  EPIC_NOT_FOUND: 'Epic not found',
+  USER_STORY_NOT_FOUND: 'User story not found',
 };
 
 export const SUCCESS_MESSAGES = {
@@ -58,6 +66,10 @@ export const SUCCESS_MESSAGES = {
   ATTACHMENT_UPLOADED: 'Attachment uploaded successfully!',
   ATTACHMENT_DOWNLOADED: 'Attachment downloaded successfully!',
   ATTACHMENT_DELETED: 'Attachment deleted successfully!',
+  EPIC_CREATED: 'Epic created successfully!',
+  EPIC_UPDATED: 'Epic updated successfully!',
+  STORY_LINKED_TO_EPIC: 'User story linked to epic successfully!',
+  STORY_UNLINKED_FROM_EPIC: 'User story unlinked from epic successfully!',
 };
 
 export const BATCH_OPERATIONS = {
@@ -130,6 +142,7 @@ export const API_ENDPOINTS = {
   ISSUE_ATTACHMENTS: '/issues/attachments',
   USERSTORY_ATTACHMENTS: '/userstories/attachments',
   TASK_ATTACHMENTS: '/tasks/attachments',
+  EPICS: '/epics',
 };
 
 export const RESPONSE_TEMPLATES = {

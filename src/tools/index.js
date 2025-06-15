@@ -14,6 +14,7 @@ import { batchCreateIssuesTool, batchCreateUserStoriesTool, batchCreateTasksTool
 import { advancedSearchTool, queryHelpTool, validateQueryTool } from './advancedSearchTools.js';
 import { addCommentTool, listCommentsTool, editCommentTool, deleteCommentTool } from './commentTools.js';
 import { uploadAttachmentTool, listAttachmentsTool, downloadAttachmentTool, deleteAttachmentTool } from './attachmentTools.js';
+import { createEpicTool, listEpicsTool, getEpicTool, updateEpicTool, linkStoryToEpicTool, unlinkStoryFromEpicTool } from './epicTools.js';
 
 /**
  * Registry of all available MCP tools
@@ -85,6 +86,16 @@ export const toolRegistry = {
     listAttachmentsTool,
     downloadAttachmentTool,
     deleteAttachmentTool
+  ],
+  
+  // Epic management tools
+  epics: [
+    createEpicTool,
+    listEpicsTool,
+    getEpicTool,
+    updateEpicTool,
+    linkStoryToEpicTool,
+    unlinkStoryFromEpicTool
   ]
 };
 

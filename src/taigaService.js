@@ -698,4 +698,130 @@ export class TaigaService {
     };
     return endpoints[itemType] || API_ENDPOINTS.ISSUE_ATTACHMENTS;
   }
+
+  /**
+   * Create a new Epic
+   * @param {Object} epicData - Epic data
+   * @returns {Promise<Object>} - Created Epic
+   */
+  async createEpic(epicData) {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.post(API_ENDPOINTS.EPICS, epicData);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to create epic:', error.message);
+      throw new Error('Failed to create epic in Taiga');
+    }
+  }
+
+  /**
+   * List all Epics in a project
+   * @param {number} projectId - Project ID
+   * @returns {Promise<Array>} - List of Epics
+   */
+  async listEpics(projectId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.get(API_ENDPOINTS.EPICS, {
+        params: {
+          project: projectId
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to list epics:', error.message);
+      throw new Error('Failed to list epics from Taiga');
+    }
+  }
+
+  /**
+   * Get Epic details by ID
+   * @param {number} epicId - Epic ID
+   * @returns {Promise<Object>} - Epic details
+   */
+  async getEpic(epicId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.get(`${API_ENDPOINTS.EPICS}/${epicId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get epic:', error.message);
+      throw new Error('Failed to get epic details from Taiga');
+    }
+  }
+
+  /**
+   * Update Epic
+   * @param {number} epicId - Epic ID
+   * @param {Object} updateData - Data to update
+   * @returns {Promise<Object>} - Updated Epic
+   */
+  async updateEpic(epicId, updateData) {
+    try {
+      const client = await createAuthenticatedClient();
+      
+      // Get current Epic to get version for update
+      const currentEpic = await this.getEpic(epicId);
+      const dataWithVersion = {
+        ...updateData,
+        version: currentEpic.version
+      };
+      
+      const response = await client.patch(`${API_ENDPOINTS.EPICS}/${epicId}`, dataWithVersion);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update epic:', error.message);
+      throw new Error('Failed to update epic in Taiga');
+    }
+  }
+
+  /**
+   * Link User Story to Epic
+   * @param {number} userStoryId - User Story ID
+   * @param {number} epicId - Epic ID
+   * @returns {Promise<Object>} - Updated User Story
+   */
+  async linkStoryToEpic(userStoryId, epicId) {
+    try {
+      const client = await createAuthenticatedClient();
+      
+      // Get current User Story to get version for update
+      const currentStory = await client.get(`${API_ENDPOINTS.USER_STORIES}/${userStoryId}`);
+      const updateData = {
+        epic: epicId,
+        version: currentStory.data.version
+      };
+      
+      const response = await client.patch(`${API_ENDPOINTS.USER_STORIES}/${userStoryId}`, updateData);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to link story to epic:', error.message);
+      throw new Error('Failed to link user story to epic');
+    }
+  }
+
+  /**
+   * Unlink User Story from Epic
+   * @param {number} userStoryId - User Story ID
+   * @returns {Promise<Object>} - Updated User Story
+   */
+  async unlinkStoryFromEpic(userStoryId) {
+    try {
+      const client = await createAuthenticatedClient();
+      
+      // Get current User Story to get version for update
+      const currentStory = await client.get(`${API_ENDPOINTS.USER_STORIES}/${userStoryId}`);
+      const updateData = {
+        epic: null,
+        version: currentStory.data.version
+      };
+      
+      const response = await client.patch(`${API_ENDPOINTS.USER_STORIES}/${userStoryId}`, updateData);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to unlink story from epic:', error.message);
+      throw new Error('Failed to unlink user story from epic');
+    }
+  }
 }
