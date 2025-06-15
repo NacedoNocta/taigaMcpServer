@@ -37,6 +37,13 @@ export const ERROR_MESSAGES = {
   FAILED_TO_DELETE_COMMENT: 'Failed to delete comment from Taiga',
   COMMENT_NOT_FOUND: 'Comment not found',
   INVALID_COMMENT_TARGET: 'Invalid comment target type',
+  FAILED_TO_UPLOAD_ATTACHMENT: 'Failed to upload attachment to Taiga',
+  FAILED_TO_LIST_ATTACHMENTS: 'Failed to list attachments from Taiga',
+  FAILED_TO_DOWNLOAD_ATTACHMENT: 'Failed to download attachment from Taiga',
+  FAILED_TO_DELETE_ATTACHMENT: 'Failed to delete attachment from Taiga',
+  ATTACHMENT_NOT_FOUND: 'Attachment not found',
+  INVALID_FILE_FORMAT: 'Invalid file format or size',
+  FILE_TOO_LARGE: 'File size exceeds maximum limit',
 };
 
 export const SUCCESS_MESSAGES = {
@@ -48,6 +55,9 @@ export const SUCCESS_MESSAGES = {
   COMMENT_ADDED: 'Comment added successfully!',
   COMMENT_EDITED: 'Comment edited successfully!',
   COMMENT_DELETED: 'Comment deleted successfully!',
+  ATTACHMENT_UPLOADED: 'Attachment uploaded successfully!',
+  ATTACHMENT_DOWNLOADED: 'Attachment downloaded successfully!',
+  ATTACHMENT_DELETED: 'Attachment deleted successfully!',
 };
 
 export const BATCH_OPERATIONS = {
@@ -117,6 +127,9 @@ export const API_ENDPOINTS = {
   USERS_ME: '/users/me',
   HISTORY: '/history',
   COMMENTS: '/history', // Comments are part of history system
+  ISSUE_ATTACHMENTS: '/issues/attachments',
+  USERSTORY_ATTACHMENTS: '/userstories/attachments',
+  TASK_ATTACHMENTS: '/tasks/attachments',
 };
 
 export const RESPONSE_TEMPLATES = {

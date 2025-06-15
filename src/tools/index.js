@@ -13,6 +13,7 @@ import { listSprintsTool, getSprintStatsTool, createSprintTool, getIssuesBySprin
 import { batchCreateIssuesTool, batchCreateUserStoriesTool, batchCreateTasksTool } from './batchTools.js';
 import { advancedSearchTool, queryHelpTool, validateQueryTool } from './advancedSearchTools.js';
 import { addCommentTool, listCommentsTool, editCommentTool, deleteCommentTool } from './commentTools.js';
+import { uploadAttachmentTool, listAttachmentsTool, downloadAttachmentTool, deleteAttachmentTool } from './attachmentTools.js';
 
 /**
  * Registry of all available MCP tools
@@ -76,6 +77,14 @@ export const toolRegistry = {
     listCommentsTool,
     editCommentTool,
     deleteCommentTool
+  ],
+  
+  // Attachment management tools
+  attachments: [
+    uploadAttachmentTool,
+    listAttachmentsTool,
+    downloadAttachmentTool,
+    deleteAttachmentTool
   ]
 };
 

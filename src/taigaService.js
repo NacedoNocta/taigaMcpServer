@@ -556,4 +556,146 @@ export class TaigaService {
       return 1; // 默認版本
     }
   }
+
+  /**
+   * Upload attachment to an item (issue, user story, or task)
+   * @param {string} itemType - Type of item ('issue', 'user_story', 'task')
+   * @param {number} itemId - ID of the item
+   * @param {string} filePath - Path to the file to upload
+   * @param {string} [description] - Optional description for the attachment
+   * @returns {Promise<Object>} - Created attachment
+   */
+  async uploadAttachment(itemType, itemId, filePath, description) {
+    try {
+      const client = await createAuthenticatedClient();
+      const fs = await import('fs');
+      const path = await import('path');
+      const FormData = await import('form-data');
+      
+      // Get attachment endpoint based on item type
+      const endpoint = this.getAttachmentEndpoint(itemType);
+      
+      // Check if file exists
+      if (!fs.existsSync(filePath)) {
+        throw new Error('File not found');
+      }
+      
+      // Create form data
+      const form = new FormData();
+      form.append('object_id', itemId.toString());
+      form.append('attached_file', fs.createReadStream(filePath));
+      
+      if (description) {
+        form.append('description', description);
+      }
+      
+      const response = await client.post(endpoint, form, {
+        headers: {
+          ...form.getHeaders(),
+        },
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error('Failed to upload attachment:', error.message);
+      throw new Error('Failed to upload attachment to Taiga');
+    }
+  }
+
+  /**
+   * List attachments for an item
+   * @param {string} itemType - Type of item ('issue', 'user_story', 'task')
+   * @param {number} itemId - ID of the item
+   * @returns {Promise<Array>} - List of attachments
+   */
+  async listAttachments(itemType, itemId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const endpoint = this.getAttachmentEndpoint(itemType);
+      
+      const response = await client.get(endpoint, {
+        params: {
+          object_id: itemId
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error('Failed to list attachments:', error.message);
+      throw new Error('Failed to list attachments from Taiga');
+    }
+  }
+
+  /**
+   * Download attachment by ID
+   * @param {number} attachmentId - ID of the attachment
+   * @param {string} [downloadPath] - Optional path to save the file
+   * @returns {Promise<Object>} - Download result with filename and path
+   */
+  async downloadAttachment(attachmentId, downloadPath) {
+    try {
+      const client = await createAuthenticatedClient();
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      // First get attachment details
+      const attachmentResponse = await client.get(`${API_ENDPOINTS.ISSUE_ATTACHMENTS}/${attachmentId}`);
+      const attachment = attachmentResponse.data;
+      
+      // Download the file
+      const fileResponse = await client.get(attachment.url, {
+        responseType: 'stream'
+      });
+      
+      // Determine save path
+      const filename = attachment.name || `attachment_${attachmentId}`;
+      const savedPath = downloadPath || path.join(process.cwd(), filename);
+      
+      // Save file
+      const writer = fs.createWriteStream(savedPath);
+      fileResponse.data.pipe(writer);
+      
+      return new Promise((resolve, reject) => {
+        writer.on('finish', () => {
+          resolve({
+            filename,
+            savedPath,
+            size: attachment.size
+          });
+        });
+        writer.on('error', reject);
+      });
+    } catch (error) {
+      console.error('Failed to download attachment:', error.message);
+      throw new Error('Failed to download attachment from Taiga');
+    }
+  }
+
+  /**
+   * Delete attachment by ID
+   * @param {number} attachmentId - ID of the attachment to delete
+   * @returns {Promise<void>}
+   */
+  async deleteAttachment(attachmentId) {
+    try {
+      const client = await createAuthenticatedClient();
+      await client.delete(`${API_ENDPOINTS.ISSUE_ATTACHMENTS}/${attachmentId}`);
+    } catch (error) {
+      console.error('Failed to delete attachment:', error.message);
+      throw new Error('Failed to delete attachment from Taiga');
+    }
+  }
+
+  /**
+   * Get attachment endpoint based on item type
+   * @private
+   */
+  getAttachmentEndpoint(itemType) {
+    const endpoints = {
+      'issue': API_ENDPOINTS.ISSUE_ATTACHMENTS,
+      'user_story': API_ENDPOINTS.USERSTORY_ATTACHMENTS,
+      'task': API_ENDPOINTS.TASK_ATTACHMENTS
+    };
+    return endpoints[itemType] || API_ENDPOINTS.ISSUE_ATTACHMENTS;
+  }
 }
