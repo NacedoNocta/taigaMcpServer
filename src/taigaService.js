@@ -824,4 +824,139 @@ export class TaigaService {
       throw new Error('Failed to unlink user story from epic');
     }
   }
+
+  // ========================= WIKI MANAGEMENT =========================
+
+  /**
+   * Create a new Wiki page
+   * @param {Object} wikiData - Wiki page data
+   * @returns {Promise<Object>} - Created wiki page
+   */
+  async createWikiPage(wikiData) {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.post(API_ENDPOINTS.WIKI, wikiData);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to create wiki page:', error.message);
+      throw new Error(ERROR_MESSAGES.FAILED_TO_CREATE_WIKI);
+    }
+  }
+
+  /**
+   * List all Wiki pages in a project
+   * @param {number} projectId - Project ID
+   * @returns {Promise<Array>} - List of wiki pages
+   */
+  async listWikiPages(projectId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.get(API_ENDPOINTS.WIKI, {
+        params: { project: projectId }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to list wiki pages:', error.message);
+      throw new Error(ERROR_MESSAGES.FAILED_TO_LIST_WIKI);
+    }
+  }
+
+  /**
+   * Get Wiki page by ID
+   * @param {number} wikiPageId - Wiki page ID
+   * @returns {Promise<Object>} - Wiki page details
+   */
+  async getWikiPage(wikiPageId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.get(`${API_ENDPOINTS.WIKI}/${wikiPageId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get wiki page:', error.message);
+      throw new Error(ERROR_MESSAGES.FAILED_TO_GET_WIKI);
+    }
+  }
+
+  /**
+   * Get Wiki page by slug
+   * @param {string} slug - Wiki page slug
+   * @param {number} projectId - Project ID
+   * @returns {Promise<Object>} - Wiki page details
+   */
+  async getWikiPageBySlug(slug, projectId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.get(`${API_ENDPOINTS.WIKI}/by_slug`, {
+        params: { 
+          slug: slug,
+          project: projectId
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get wiki page by slug:', error.message);
+      throw new Error(ERROR_MESSAGES.FAILED_TO_GET_WIKI);
+    }
+  }
+
+  /**
+   * Update Wiki page
+   * @param {number} wikiPageId - Wiki page ID
+   * @param {Object} updateData - Update data
+   * @returns {Promise<Object>} - Updated wiki page
+   */
+  async updateWikiPage(wikiPageId, updateData) {
+    try {
+      const client = await createAuthenticatedClient();
+      
+      // Get current wiki page to get version for update
+      const currentWiki = await client.get(`${API_ENDPOINTS.WIKI}/${wikiPageId}`);
+      const dataWithVersion = {
+        ...updateData,
+        version: currentWiki.data.version
+      };
+      
+      const response = await client.patch(`${API_ENDPOINTS.WIKI}/${wikiPageId}`, dataWithVersion);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update wiki page:', error.message);
+      throw new Error(ERROR_MESSAGES.FAILED_TO_UPDATE_WIKI);
+    }
+  }
+
+  /**
+   * Delete Wiki page
+   * @param {number} wikiPageId - Wiki page ID
+   * @returns {Promise<void>}
+   */
+  async deleteWikiPage(wikiPageId) {
+    try {
+      const client = await createAuthenticatedClient();
+      await client.delete(`${API_ENDPOINTS.WIKI}/${wikiPageId}`);
+    } catch (error) {
+      console.error('Failed to delete wiki page:', error.message);
+      throw new Error(ERROR_MESSAGES.FAILED_TO_DELETE_WIKI);
+    }
+  }
+
+  /**
+   * Watch/Unwatch Wiki page
+   * @param {number} wikiPageId - Wiki page ID
+   * @param {boolean} watch - True to watch, false to unwatch
+   * @returns {Promise<Object>} - Response data
+   */
+  async watchWikiPage(wikiPageId, watch = true) {
+    try {
+      const client = await createAuthenticatedClient();
+      const endpoint = watch ? 
+        `${API_ENDPOINTS.WIKI}/${wikiPageId}/watch` : 
+        `${API_ENDPOINTS.WIKI}/${wikiPageId}/unwatch`;
+      
+      const response = await client.post(endpoint);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to watch/unwatch wiki page:', error.message);
+      throw new Error(ERROR_MESSAGES.FAILED_TO_WATCH_WIKI);
+    }
+  }
 }

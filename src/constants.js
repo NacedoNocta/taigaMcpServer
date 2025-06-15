@@ -52,6 +52,14 @@ export const ERROR_MESSAGES = {
   FAILED_TO_UNLINK_STORY: 'Failed to unlink user story from epic',
   EPIC_NOT_FOUND: 'Epic not found',
   USER_STORY_NOT_FOUND: 'User story not found',
+  FAILED_TO_CREATE_WIKI: 'Failed to create wiki page in Taiga',
+  FAILED_TO_LIST_WIKI: 'Failed to list wiki pages from Taiga',
+  FAILED_TO_GET_WIKI: 'Failed to get wiki page details from Taiga',
+  FAILED_TO_UPDATE_WIKI: 'Failed to update wiki page in Taiga',
+  FAILED_TO_DELETE_WIKI: 'Failed to delete wiki page from Taiga',
+  FAILED_TO_WATCH_WIKI: 'Failed to watch/unwatch wiki page',
+  WIKI_PAGE_NOT_FOUND: 'Wiki page not found',
+  INVALID_WIKI_SLUG: 'Invalid wiki page slug format',
 };
 
 export const SUCCESS_MESSAGES = {
@@ -70,6 +78,10 @@ export const SUCCESS_MESSAGES = {
   EPIC_UPDATED: 'Epic updated successfully!',
   STORY_LINKED_TO_EPIC: 'User story linked to epic successfully!',
   STORY_UNLINKED_FROM_EPIC: 'User story unlinked from epic successfully!',
+  WIKI_PAGE_CREATED: 'Wiki page created successfully!',
+  WIKI_PAGE_UPDATED: 'Wiki page updated successfully!',
+  WIKI_PAGE_DELETED: 'Wiki page deleted successfully!',
+  WIKI_PAGE_WATCHED: 'Wiki page watch status updated successfully!',
 };
 
 export const BATCH_OPERATIONS = {
@@ -143,6 +155,8 @@ export const API_ENDPOINTS = {
   USERSTORY_ATTACHMENTS: '/userstories/attachments',
   TASK_ATTACHMENTS: '/tasks/attachments',
   EPICS: '/epics',
+  WIKI: '/wiki',
+  WIKI_ATTACHMENTS: '/wiki/attachments',
 };
 
 export const RESPONSE_TEMPLATES = {
@@ -151,6 +165,7 @@ export const RESPONSE_TEMPLATES = {
   NO_TASKS: 'No tasks found.',
   NO_ISSUES: 'No issues found in this project.',
   NO_SPRINTS: 'No sprints found in this project.',
+  NO_WIKI_PAGES: 'No wiki pages found in this project.',
   PROJECT_REQUIRED_FOR_REF: 'Project identifier is required when using reference number.',
 };
 

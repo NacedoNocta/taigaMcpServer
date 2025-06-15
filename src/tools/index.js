@@ -15,6 +15,7 @@ import { advancedSearchTool, queryHelpTool, validateQueryTool } from './advanced
 import { addCommentTool, listCommentsTool, editCommentTool, deleteCommentTool } from './commentTools.js';
 import { uploadAttachmentTool, listAttachmentsTool, downloadAttachmentTool, deleteAttachmentTool } from './attachmentTools.js';
 import { createEpicTool, listEpicsTool, getEpicTool, updateEpicTool, linkStoryToEpicTool, unlinkStoryFromEpicTool } from './epicTools.js';
+import { createWikiPageTool, listWikiPagesTool, getWikiPageTool, updateWikiPageTool, deleteWikiPageTool, watchWikiPageTool } from './wikiTools.js';
 
 /**
  * Registry of all available MCP tools
@@ -96,6 +97,16 @@ export const toolRegistry = {
     updateEpicTool,
     linkStoryToEpicTool,
     unlinkStoryFromEpicTool
+  ],
+  
+  // Wiki management tools
+  wiki: [
+    createWikiPageTool,
+    listWikiPagesTool,
+    getWikiPageTool,
+    updateWikiPageTool,
+    deleteWikiPageTool,
+    watchWikiPageTool
   ]
 };
 
