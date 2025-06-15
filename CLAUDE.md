@@ -14,7 +14,8 @@ This file provides comprehensive guidance to Claude Code (claude.ai/code) when w
 - **评论协作系统** - 完整的团队讨论和协作功能
 - **文件附件管理** - 上传、下载、管理项目文件资源
 - **Epic项目管理** - 大型项目史诗级功能组织和管理
-- **模块化架构** - 33个MCP工具，11个功能分类
+- **Wiki知识管理** - 完整的项目文档和知识库系统
+- **模块化架构** - 39个MCP工具，12个功能分类
 - **专业测试框架** - 单元测试、集成测试、MCP协议测试、专项功能测试
 - **AI协作开发** - 展示人机协作软件开发潜力
 
@@ -176,7 +177,7 @@ src/
     └── epicTools.js     # Epic管理工具
 ```
 
-### MCP工具分类（33个工具）
+### MCP工具分类（39个工具）
 
 #### 🔐 认证工具 (1个)
 - `authenticate` - Taiga用户认证
@@ -232,6 +233,14 @@ src/
 - `updateEpic` - 更新Epic信息和状态
 - `linkStoryToEpic` - 将用户故事关联到Epic
 - `unlinkStoryFromEpic` - 从Epic中移除用户故事关联
+
+#### 📖 Wiki管理 (6个) - **知识库和文档中心**
+- `createWikiPage` - 创建项目Wiki页面，支持Markdown
+- `listWikiPages` - 列出项目中的所有Wiki页面
+- `getWikiPage` - 通过ID或slug获取Wiki页面详情
+- `updateWikiPage` - 更新Wiki页面内容和设置
+- `deleteWikiPage` - 删除Wiki页面（不可逆操作）
+- `watchWikiPage` - 关注/取消关注Wiki页面变更通知
 
 ### 测试架构
 ```

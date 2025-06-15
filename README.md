@@ -55,6 +55,14 @@ A powerful **Model Context Protocol (MCP)** server that enables natural language
 - **Progress Tracking**: Epic-level progress statistics and completion tracking
 - **Enterprise Planning**: Support for roadmap planning and feature releases
 
+### 📖 Wiki Management (Knowledge Base)
+- **Documentation Hub**: Create and manage project Wiki pages for knowledge sharing
+- **Markdown Support**: Full Markdown editing with rich content formatting
+- **Flexible Identification**: Access pages by ID or user-friendly slug names
+- **Collaboration Features**: Watch/unwatch pages for change notifications
+- **Version Control**: Automatic versioning prevents edit conflicts
+- **Content Organization**: Centralized documentation management per project
+
 ### 💬 Natural Language Interface
 - **"List all projects"**
 - **"Show me Sprint 5 progress statistics"**
@@ -293,7 +301,28 @@ For self-hosted Taiga instances:
 ✏️ Returns: Epic updated with new status and organizational tags
 ```
 
-## 🔧 Available Tools (33 Total)
+### Wiki Management Examples
+```
+🗣️ "Create wiki page 'api-documentation' in project MyApp with content about API usage"
+📖 Returns: Wiki page created with slug, project association, and content preview
+
+🗣️ "List all wiki pages in project MyApp"
+📋 Returns: Complete wiki page list with modification dates and content summaries
+
+🗣️ "Get wiki page 'user-guide' details from project MyApp"
+🔍 Returns: Full wiki content, metadata, watchers, and version information
+
+🗣️ "Update wiki page 'installation-guide' with new Docker instructions"
+✏️ Returns: Wiki page updated with new content and incremented version
+
+🗣️ "Watch wiki page 'api-documentation' for change notifications"
+👁️ Returns: Successfully subscribed to wiki page change notifications
+
+🗣️ "Delete wiki page 'outdated-info' from project MyApp"
+🗑️ Returns: Wiki page permanently deleted with confirmation details
+```
+
+## 🔧 Available Tools (39 Total)
 
 ### 🔐 Authentication (1 tool)
 | Tool | Description |
@@ -372,11 +401,21 @@ For self-hosted Taiga instances:
 | `linkStoryToEpic` | Link User Stories to Epics |
 | `unlinkStoryFromEpic` | Remove Story-Epic associations |
 
+### 📖 Wiki Management (6 tools)
+| Tool | Description |
+|------|-------------|
+| `createWikiPage` | Create project Wiki pages with Markdown support |
+| `listWikiPages` | List all Wiki pages in a project |
+| `getWikiPage` | Get Wiki page details by ID or slug |
+| `updateWikiPage` | Update Wiki page content and settings |
+| `deleteWikiPage` | Delete Wiki pages (irreversible) |
+| `watchWikiPage` | Watch/unwatch Wiki pages for notifications |
+
 ## 🚀 Why Choose Taiga MCP Server?
 
 - **🔥 Zero Setup**: Works immediately with npx
 - **🧠 AI-Native**: Built specifically for conversational project management
-- **🔗 Complete Integration**: Full Taiga API coverage with 33 tools
+- **🔗 Complete Integration**: Full Taiga API coverage with 39 tools
 - **📊 Rich Data**: Detailed progress tracking and statistics
 - **🎯 Sprint-Focused**: Advanced sprint-issue relationship tracking  
 - **🛡️ Secure**: Environment-based credential management
@@ -384,6 +423,7 @@ For self-hosted Taiga instances:
 - **💬 Team Collaboration**: Complete comment system for enhanced communication
 - **📎 File Management**: Full attachment lifecycle with multi-format support
 - **🏛️ Enterprise-Ready**: Epic management for large-scale project organization
+- **📖 Knowledge Management**: Complete Wiki system for project documentation
 - **🔍 Advanced Search**: SQL-like query syntax for complex data filtering
 
 ## 🙏 Acknowledgments
