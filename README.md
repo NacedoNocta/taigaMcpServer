@@ -30,12 +30,30 @@ A powerful **Model Context Protocol (MCP)** server that enables natural language
 - **Smart Error Handling**: Individual failures don't affect other items
 - **Detailed Reporting**: Success/failure status for each item
 
-### 🔍 Advanced Query Syntax (NEW!)
+### 🔍 Advanced Query Syntax
 - **SQL-like Query Language**: Use `field:operator:value` syntax for precise searches
 - **Logical Operators**: Combine conditions with AND, OR, NOT
 - **Text Matching**: Fuzzy search, wildcards, and substring matching
 - **Date Ranges**: Flexible time-based queries (today, last_week, >7d)
 - **Sorting & Limiting**: ORDER BY and LIMIT clauses for result control
+
+### 💬 Team Collaboration System
+- **Comment Management**: Add, view, edit, and delete comments on any work item
+- **Discussion Threads**: Complete comment history with user information
+- **Team Communication**: Enhanced collaboration through structured discussions
+- **Real-time Updates**: Immediate comment synchronization across team
+
+### 📎 File Attachment Management
+- **File Upload**: Attach documents, images, and resources to work items
+- **Multi-format Support**: Support for all major file types
+- **Download Management**: Efficient file download with path management
+- **Storage Organization**: Clean attachment management with descriptions
+
+### 🏛️ Epic Management (Enterprise)
+- **Large-scale Organization**: Create and manage Epic-level project components
+- **Hierarchical Structure**: Link User Stories to Epics for complete project visibility
+- **Progress Tracking**: Epic-level progress statistics and completion tracking
+- **Enterprise Planning**: Support for roadmap planning and feature releases
 
 ### 💬 Natural Language Interface
 - **"List all projects"**
@@ -242,42 +260,131 @@ For self-hosted Taiga instances:
 🗑️ Returns: Comment removed from the discussion thread
 ```
 
-## 🔧 Available Tools
+### File Attachment Examples
+```
+🗣️ "Upload design.pdf to user story #456 with description 'UI mockup v2'"
+📎 Returns: File uploaded successfully with size and metadata
 
+🗣️ "List all attachments for issue #789"
+📂 Returns: Complete attachment list with filenames, sizes, and upload dates
+
+🗣️ "Download attachment #123 to /Downloads/documents/"
+⬇️ Returns: File downloaded successfully to specified location
+
+🗣️ "Delete attachment #456"
+🗑️ Returns: Attachment removed from the project
+```
+
+### Epic Management Examples
+```
+🗣️ "Create epic 'API v2.0 Migration' in project MyApp with description 'Complete API redesign'"
+🏛️ Returns: Epic created with ID, color, and project association
+
+🗣️ "List all epics in project MyApp"
+📋 Returns: Epic list with progress stats and linked user stories count
+
+🗣️ "Get details for epic #789"
+📊 Returns: Epic overview with progress, status, and linked user stories
+
+🗣️ "Link user story #456 to epic #789"
+🔗 Returns: Story successfully linked to epic for better organization
+
+🗣️ "Update epic #789 status to 'In Progress' and add tag 'backend'"
+✏️ Returns: Epic updated with new status and organizational tags
+```
+
+## 🔧 Available Tools (33 Total)
+
+### 🔐 Authentication (1 tool)
+| Tool | Description |
+|------|-------------|
+| `authenticate` | Authenticate with Taiga API |
+
+### 📁 Project Management (2 tools)
 | Tool | Description |
 |------|-------------|
 | `listProjects` | Get all accessible projects |
 | `getProject` | View detailed project information |
+
+### 🏃 Sprint Management (4 tools)
+| Tool | Description |
+|------|-------------|
 | `listMilestones` | List all sprints in a project |
 | `getMilestoneStats` | Get sprint progress and statistics |
-| `createMilestones` | Create new sprints with dates |
-| `listUserStories` | View user stories in a project |
-| `createUserStory` | Create new user stories |
+| `createMilestone` | Create new sprints with dates |
+| `getIssuesByMilestone` | View all issues in a sprint |
+
+### 🐛 Issue Management (3 tools)
+| Tool | Description |
+|------|-------------|
 | `listIssues` | List issues with sprint info |
 | `getIssue` | Get detailed issue information |
-| `getIssuesByMilestone` | View all issues in a sprint |
 | `createIssue` | Create issues with priorities/types |
+
+### 📝 User Story Management (2 tools)
+| Tool | Description |
+|------|-------------|
+| `listUserStories` | View user stories in a project |
+| `createUserStory` | Create new user stories |
+
+### ✅ Task Management (1 tool)
+| Tool | Description |
+|------|-------------|
 | `createTask` | Create tasks linked to user stories |
-| `batchCreateIssues` | **NEW!** Batch create multiple issues (up to 20) |
-| `batchCreateUserStories` | **NEW!** Batch create multiple user stories |
-| `batchCreateTasks` | **NEW!** Batch create multiple tasks for a user story |
-| `advancedSearch` | **NEW!** Execute advanced SQL-like queries |
-| `queryHelp` | **NEW!** Get query syntax help and examples |
-| `validateQuery` | **NEW!** Validate query syntax before execution |
-| `addComment` | **NEW!** Add comments to issues, stories, or tasks |
-| `listComments` | **NEW!** View comment history for items |
-| `editComment` | **NEW!** Edit existing comments |
-| `deleteComment` | **NEW!** Delete comments |
+
+### 🚀 Batch Operations (3 tools)
+| Tool | Description |
+|------|-------------|
+| `batchCreateIssues` | Batch create multiple issues (up to 20) |
+| `batchCreateUserStories` | Batch create multiple user stories |
+| `batchCreateTasks` | Batch create multiple tasks for a user story |
+
+### 🔍 Advanced Search (3 tools)
+| Tool | Description |
+|------|-------------|
+| `advancedSearch` | Execute advanced SQL-like queries |
+| `queryHelp` | Get query syntax help and examples |
+| `validateQuery` | Validate query syntax before execution |
+
+### 💬 Comment System (4 tools)
+| Tool | Description |
+|------|-------------|
+| `addComment` | Add comments to issues, stories, or tasks |
+| `listComments` | View comment history for items |
+| `editComment` | Edit existing comments |
+| `deleteComment` | Delete comments |
+
+### 📎 File Attachments (4 tools)
+| Tool | Description |
+|------|-------------|
+| `uploadAttachment` | Upload files to issues, stories, or tasks |
+| `listAttachments` | View attachment list for items |
+| `downloadAttachment` | Download attachments by ID |
+| `deleteAttachment` | Delete attachments |
+
+### 🏛️ Epic Management (6 tools)
+| Tool | Description |
+|------|-------------|
+| `createEpic` | Create large-scale Epic features |
+| `listEpics` | List all Epics in a project |
+| `getEpic` | Get Epic details and progress stats |
+| `updateEpic` | Update Epic information and status |
+| `linkStoryToEpic` | Link User Stories to Epics |
+| `unlinkStoryFromEpic` | Remove Story-Epic associations |
 
 ## 🚀 Why Choose Taiga MCP Server?
 
 - **🔥 Zero Setup**: Works immediately with npx
 - **🧠 AI-Native**: Built specifically for conversational project management
-- **🔗 Complete Integration**: Full Taiga API coverage
+- **🔗 Complete Integration**: Full Taiga API coverage with 33 tools
 - **📊 Rich Data**: Detailed progress tracking and statistics
 - **🎯 Sprint-Focused**: Advanced sprint-issue relationship tracking  
 - **🛡️ Secure**: Environment-based credential management
 - **🚀 Batch Operations**: Efficient bulk operations for large projects
+- **💬 Team Collaboration**: Complete comment system for enhanced communication
+- **📎 File Management**: Full attachment lifecycle with multi-format support
+- **🏛️ Enterprise-Ready**: Epic management for large-scale project organization
+- **🔍 Advanced Search**: SQL-like query syntax for complex data filtering
 
 ## 🙏 Acknowledgments
 
@@ -291,12 +398,17 @@ This project was **inspired by** [mcpTAIGA](https://github.com/adriapedralbes/mc
 From the original basic concept, this version expanded to include:
 
 - **Complete Architectural Redesign**: Professional modular tool system (v1.5.0+)
-- **10x+ Code Expansion**: From basic functionality to enterprise-grade project management
+- **33 MCP Tools**: From basic functionality to enterprise-grade project management
 - **Advanced Sprint Management**: Complete milestone tracking with detailed statistics
 - **Enhanced Issue Management**: Full issue lifecycle with sprint associations  
+- **Batch Operations**: Efficient bulk creation for large-scale projects (v1.6.0)
+- **Advanced Query System**: SQL-like syntax for complex data filtering (v1.6.1)
+- **Team Collaboration**: Complete comment system for enhanced communication (v1.7.0)
+- **File Management**: Full attachment lifecycle with multi-format support (v1.7.1)
+- **Epic Management**: Enterprise-grade large-scale project organization (v1.8.0)
 - **Professional Code Quality**: Error handling, formatting, comprehensive testing
-- **Comprehensive Documentation**: Professional guides and examples
-- **NPM Distribution**: Easy installation and deployment
+- **Comprehensive Documentation**: Professional guides and examples in 3 languages
+- **Automated CI/CD**: Dual registry publishing with complete automation
 
 **Original concept**: Basic Taiga MCP connectivity  
 **This implementation**: Full-featured Taiga project management suite with entirely new architecture
@@ -359,7 +471,8 @@ ISC License - This project is licensed under the ISC License, same as the origin
 - **Original Inspiration**: [adriapedralbes](https://github.com/adriapedralbes) / [mcpTAIGA](https://github.com/adriapedralbes/mcpTAIGA)
 - **This Implementation**: Substantial rewrite by greddy7574@gmail.com with AI assistance from Claude Code
 - **License**: ISC License
-- **Architecture**: Entirely new modular design with 10x+ expanded functionality
+- **Architecture**: Entirely new modular design with 33 MCP tools across 11 categories
+- **Current Version**: v1.8.0 - Enterprise Integration Edition with Epic Management
 
 ---
 
