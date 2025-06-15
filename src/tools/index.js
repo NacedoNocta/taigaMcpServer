@@ -12,6 +12,7 @@ import { listIssuesTool, getIssueTool, createIssueTool } from './issueTools.js';
 import { listSprintsTool, getSprintStatsTool, createSprintTool, getIssuesBySprintTool } from './sprintTools.js';
 import { batchCreateIssuesTool, batchCreateUserStoriesTool, batchCreateTasksTool } from './batchTools.js';
 import { advancedSearchTool, queryHelpTool, validateQueryTool } from './advancedSearchTools.js';
+import { addCommentTool, listCommentsTool, editCommentTool, deleteCommentTool } from './commentTools.js';
 
 /**
  * Registry of all available MCP tools
@@ -67,6 +68,14 @@ export const toolRegistry = {
     advancedSearchTool,
     queryHelpTool,
     validateQueryTool
+  ],
+  
+  // Comment system tools
+  comments: [
+    addCommentTool,
+    listCommentsTool,
+    editCommentTool,
+    deleteCommentTool
   ]
 };
 

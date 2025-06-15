@@ -417,4 +417,143 @@ export class TaigaService {
       throw new Error('Failed to create milestone in Taiga');
     }
   }
+
+  /**
+   * Add comment to an item (issue, user story, or task)
+   * @param {string} itemType - Type of item ('issue', 'user_story', 'task')
+   * @param {number} itemId - ID of the item
+   * @param {Object} commentData - Comment data
+   * @returns {Promise<Object>} - Created comment
+   */
+  async addComment(itemType, itemId, commentData) {
+    try {
+      const client = await createAuthenticatedClient();
+      
+      // Taiga使用歷史API來處理評論
+      // 通過更新項目並添加評論來創建評論記錄
+      const endpoint = this.getItemEndpoint(itemType);
+      const updateData = {
+        comment: commentData.comment,
+        version: await this.getItemVersion(itemType, itemId)
+      };
+      
+      const response = await client.patch(`${endpoint}/${itemId}`, updateData);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to add comment:', error.message);
+      throw new Error('Failed to add comment to Taiga');
+    }
+  }
+
+  /**
+   * Get history/comments for an item
+   * @param {string} itemType - Type of item ('issue', 'user_story', 'task')  
+   * @param {number} itemId - ID of the item
+   * @returns {Promise<Array>} - History entries including comments
+   */
+  async getItemHistory(itemType, itemId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const objectType = this.getHistoryObjectType(itemType);
+      const response = await client.get(`${API_ENDPOINTS.HISTORY}/${objectType}/${itemId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get item history:', error.message);
+      throw new Error('Failed to get item history from Taiga');
+    }
+  }
+
+  /**
+   * Edit a comment
+   * @param {number} commentId - ID of the comment  
+   * @param {string} newComment - New comment content
+   * @returns {Promise<Object>} - Updated comment
+   */
+  async editComment(commentId, newComment) {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.patch(`${API_ENDPOINTS.HISTORY}/edit-comment`, {
+        id: commentId,
+        comment: newComment
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to edit comment:', error.message);
+      throw new Error('Failed to edit comment in Taiga');
+    }
+  }
+
+  /**
+   * Delete a comment
+   * @param {number} commentId - ID of the comment to delete
+   * @returns {Promise<void>}
+   */
+  async deleteComment(commentId) {
+    try {
+      const client = await createAuthenticatedClient();
+      await client.delete(`${API_ENDPOINTS.HISTORY}/delete-comment`, {
+        data: { id: commentId }
+      });
+    } catch (error) {
+      console.error('Failed to delete comment:', error.message);
+      throw new Error('Failed to delete comment from Taiga');
+    }
+  }
+
+  /**
+   * Get current user ID
+   * @returns {Promise<number>} - Current user ID
+   */
+  async getCurrentUserId() {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.get(API_ENDPOINTS.USERS_ME);
+      return response.data.id;
+    } catch (error) {
+      console.error('Failed to get current user:', error.message);
+      throw new Error('Failed to get current user from Taiga');
+    }
+  }
+
+  /**
+   * Get item endpoint based on type
+   * @private
+   */
+  getItemEndpoint(itemType) {
+    const endpoints = {
+      'issue': API_ENDPOINTS.ISSUES,
+      'user_story': API_ENDPOINTS.USER_STORIES,
+      'task': API_ENDPOINTS.TASKS
+    };
+    return endpoints[itemType] || API_ENDPOINTS.ISSUES;
+  }
+
+  /**
+   * Get history object type based on item type
+   * @private
+   */
+  getHistoryObjectType(itemType) {
+    const types = {
+      'issue': 'issue',
+      'user_story': 'userstory',
+      'task': 'task'
+    };
+    return types[itemType] || 'issue';
+  }
+
+  /**
+   * Get current version of an item (needed for comment updates)
+   * @private
+   */
+  async getItemVersion(itemType, itemId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const endpoint = this.getItemEndpoint(itemType);
+      const response = await client.get(`${endpoint}/${itemId}`);
+      return response.data.version || 1;
+    } catch (error) {
+      console.error('Failed to get item version:', error.message);
+      return 1; // 默認版本
+    }
+  }
 }

@@ -227,6 +227,21 @@ For self-hosted Taiga instances:
 🔍 Returns: All tasks mentioning API with relevance ranking
 ```
 
+### Comment System Examples
+```
+🗣️ "Add comment to issue #123: 'This needs more testing before deployment'"
+💬 Returns: Comment added successfully with timestamp and user info
+
+🗣️ "Show me all comments for user story #456"
+📝 Returns: Complete comment history with user names and dates
+
+🗣️ "Edit comment #789 to say 'Updated implementation approach'"
+✏️ Returns: Comment updated successfully with new content
+
+🗣️ "Delete comment #321"
+🗑️ Returns: Comment removed from the discussion thread
+```
+
 ## 🔧 Available Tools
 
 | Tool | Description |
@@ -249,6 +264,10 @@ For self-hosted Taiga instances:
 | `advancedSearch` | **NEW!** Execute advanced SQL-like queries |
 | `queryHelp` | **NEW!** Get query syntax help and examples |
 | `validateQuery` | **NEW!** Validate query syntax before execution |
+| `addComment` | **NEW!** Add comments to issues, stories, or tasks |
+| `listComments` | **NEW!** View comment history for items |
+| `editComment` | **NEW!** Edit existing comments |
+| `deleteComment` | **NEW!** Delete comments |
 
 ## 🚀 Why Choose Taiga MCP Server?
 

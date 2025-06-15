@@ -31,6 +31,12 @@ export const ERROR_MESSAGES = {
   FAILED_TO_GET_ISSUE: 'Failed to get issue details from Taiga',
   FAILED_TO_GET_SPRINT: 'Failed to get sprint details from Taiga',
   FAILED_TO_GET_SPRINT_STATS: 'Failed to get sprint statistics from Taiga',
+  FAILED_TO_ADD_COMMENT: 'Failed to add comment to Taiga',
+  FAILED_TO_LIST_COMMENTS: 'Failed to list comments from Taiga',
+  FAILED_TO_EDIT_COMMENT: 'Failed to edit comment in Taiga',
+  FAILED_TO_DELETE_COMMENT: 'Failed to delete comment from Taiga',
+  COMMENT_NOT_FOUND: 'Comment not found',
+  INVALID_COMMENT_TARGET: 'Invalid comment target type',
 };
 
 export const SUCCESS_MESSAGES = {
@@ -39,6 +45,9 @@ export const SUCCESS_MESSAGES = {
   TASK_CREATED: 'Task created successfully!',
   ISSUE_CREATED: 'Issue created successfully!',
   SPRINT_CREATED: 'Sprint created successfully!',
+  COMMENT_ADDED: 'Comment added successfully!',
+  COMMENT_EDITED: 'Comment edited successfully!',
+  COMMENT_DELETED: 'Comment deleted successfully!',
 };
 
 export const BATCH_OPERATIONS = {
@@ -106,6 +115,8 @@ export const API_ENDPOINTS = {
   SEVERITIES: '/severities',
   ISSUE_TYPES: '/issue-types',
   USERS_ME: '/users/me',
+  HISTORY: '/history',
+  COMMENTS: '/history', // Comments are part of history system
 };
 
 export const RESPONSE_TEMPLATES = {
