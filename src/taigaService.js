@@ -638,15 +638,16 @@ export class TaigaService {
         fileExists = fs.default.existsSync(absolutePath);
       } else {
         // For relative paths, try different resolution strategies
+        const homeDir = process.env.HOME || process.env.USERPROFILE || require('os').homedir();
         const possiblePaths = [
           // 1. Relative to current working directory
-          path.default.resolve(filePath),
+          path.default.resolve(process.cwd(), filePath),
           // 2. Relative to user's home directory
-          path.default.resolve(process.env.HOME || process.env.USERPROFILE || '~', filePath),
+          path.default.resolve(homeDir, filePath),
           // 3. Relative to Desktop (common location for downloaded files)
-          path.default.resolve(process.env.HOME || process.env.USERPROFILE || '~', 'Desktop', filePath),
-          // 4. Just the filename in current directory
-          path.default.resolve(process.cwd(), filePath)
+          path.default.resolve(homeDir, 'Desktop', filePath),
+          // 4. Relative to Downloads (another common location)
+          path.default.resolve(homeDir, 'Downloads', filePath)
         ];
         
         for (const tryPath of possiblePaths) {
@@ -659,13 +660,14 @@ export class TaigaService {
       }
       
       if (!fileExists) {
+        const homeDir = process.env.HOME || process.env.USERPROFILE || require('os').homedir();
         const searchedPaths = path.default.isAbsolute(filePath) 
           ? [filePath]
           : [
-              path.default.resolve(filePath),
-              path.default.resolve(process.env.HOME || '~', filePath),
-              path.default.resolve(process.env.HOME || '~', 'Desktop', filePath),
-              path.default.resolve(process.cwd(), filePath)
+              path.default.resolve(process.cwd(), filePath),
+              path.default.resolve(homeDir, filePath),
+              path.default.resolve(homeDir, 'Desktop', filePath),
+              path.default.resolve(homeDir, 'Downloads', filePath)
             ];
         throw new Error(`File not found. Searched paths:\n${searchedPaths.join('\n')}`);
       }
