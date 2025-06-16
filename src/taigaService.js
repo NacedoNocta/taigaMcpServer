@@ -628,10 +628,46 @@ export class TaigaService {
         throw new Error(`Invalid file path: ${filePath}`);
       }
       
-      // Check if file exists - support both relative and absolute paths
-      const absolutePath = path.default.isAbsolute(filePath) ? filePath : path.default.resolve(filePath);
-      if (!fs.default.existsSync(absolutePath)) {
-        throw new Error(`File not found: ${absolutePath}`);
+      // Check if file exists - try multiple path resolution strategies
+      let absolutePath;
+      let fileExists = false;
+      
+      if (path.default.isAbsolute(filePath)) {
+        // If already absolute, use as-is
+        absolutePath = filePath;
+        fileExists = fs.default.existsSync(absolutePath);
+      } else {
+        // For relative paths, try different resolution strategies
+        const possiblePaths = [
+          // 1. Relative to current working directory
+          path.default.resolve(filePath),
+          // 2. Relative to user's home directory
+          path.default.resolve(process.env.HOME || process.env.USERPROFILE || '~', filePath),
+          // 3. Relative to Desktop (common location for downloaded files)
+          path.default.resolve(process.env.HOME || process.env.USERPROFILE || '~', 'Desktop', filePath),
+          // 4. Just the filename in current directory
+          path.default.resolve(process.cwd(), filePath)
+        ];
+        
+        for (const tryPath of possiblePaths) {
+          if (fs.default.existsSync(tryPath)) {
+            absolutePath = tryPath;
+            fileExists = true;
+            break;
+          }
+        }
+      }
+      
+      if (!fileExists) {
+        const searchedPaths = path.default.isAbsolute(filePath) 
+          ? [filePath]
+          : [
+              path.default.resolve(filePath),
+              path.default.resolve(process.env.HOME || '~', filePath),
+              path.default.resolve(process.env.HOME || '~', 'Desktop', filePath),
+              path.default.resolve(process.cwd(), filePath)
+            ];
+        throw new Error(`File not found. Searched paths:\n${searchedPaths.join('\n')}`);
       }
       
       // Read file stats and create form data
