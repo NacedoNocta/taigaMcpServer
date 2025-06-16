@@ -567,13 +567,18 @@ export class TaigaService {
    */
   async uploadAttachment(itemType, itemId, filePath, description) {
     try {
-      const client = await createAuthenticatedClient();
+      // Get the auth token
+      if (!this.authToken) {
+        throw new Error('Not authenticated');
+      }
+      
       const fs = await import('fs');
       const path = await import('path');
       const { default: FormData } = await import('form-data');
       
       // Get attachment endpoint based on item type
       const endpoint = this.getAttachmentEndpoint(itemType);
+      const fullUrl = `${this.baseUrl}${endpoint}`;
       
       // Check if file exists
       if (!fs.default.existsSync(filePath)) {
@@ -589,13 +594,21 @@ export class TaigaService {
         form.append('description', description);
       }
       
-      const response = await client.post(endpoint, form, {
+      // Use fetch instead of axios for better form-data compatibility
+      const response = await fetch(fullUrl, {
+        method: 'POST',
         headers: {
+          'Authorization': `Bearer ${this.authToken}`,
           ...form.getHeaders(),
         },
+        body: form,
       });
       
-      return response.data;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
     } catch (error) {
       console.error('Failed to upload attachment:', error.message);
       throw new Error('Failed to upload attachment to Taiga');
