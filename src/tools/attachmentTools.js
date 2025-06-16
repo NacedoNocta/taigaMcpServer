@@ -10,16 +10,6 @@ import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants.js';
 
 const taigaService = new TaigaService();
 
-// Shared schema for attachment operations
-const attachmentTargetSchema = z.object({
-  itemType: z.enum(['issue', 'user_story', 'task'], {
-    description: 'Type of item to attach file to'
-  }),
-  itemId: z.number({
-    description: 'ID of the item to attach file to'
-  })
-});
-
 /**
  * Upload attachment tool
  * Uploads a file attachment to an Issue, User Story, or Task
@@ -27,26 +17,18 @@ const attachmentTargetSchema = z.object({
 export const uploadAttachmentTool = {
   name: 'uploadAttachment',
   description: 'Upload a file attachment to an Issue, User Story, or Task',
-  inputSchema: z.object({
-    itemType: z.enum(['issue', 'user_story', 'task']),
-    itemId: z.union([z.number(), z.string()]).transform(val => typeof val === 'string' ? parseInt(val) : val),
+  schema: {
+    itemType: z.enum(['issue', 'user_story', 'task']).describe('Type of item to attach file to'),
+    itemId: z.union([z.number(), z.string()]).transform(val => typeof val === 'string' ? parseInt(val) : val).describe('ID of the item to attach file to'),
     projectIdentifier: z.string().optional().describe('Project ID or slug (required for issues)'),
-    filePath: z.string().min(1, 'File path is required'),
+    filePath: z.string().min(1).describe('File path is required'),
     description: z.string().optional().describe('Optional description for the attachment')
-  }),
+  },
   
-  handler: async (args) => {
+  handler: async ({ itemType, itemId, projectIdentifier, filePath, description }) => {
     try {
-      // Debug: log received arguments
-      const { itemType, itemId, projectIdentifier, filePath, description } = args;
-      
       if (!taigaService.isAuthenticated()) {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
-      }
-      
-      // Validate required parameters
-      if (!filePath) {
-        return createErrorResponse(`Missing required parameter: filePath. Received arguments: ${JSON.stringify(args)}`);
       }
 
       // 對於issues，projectIdentifier是必需的
@@ -100,7 +82,10 @@ export const uploadAttachmentTool = {
 export const listAttachmentsTool = {
   name: 'listAttachments',
   description: 'List all attachments for an Issue, User Story, or Task',
-  inputSchema: attachmentTargetSchema,
+  schema: {
+    itemType: z.enum(['issue', 'user_story', 'task']).describe('Type of item to list attachments for'),
+    itemId: z.number().describe('ID of the item to list attachments for')
+  },
   
   handler: async ({ itemType, itemId }) => {
     try {
@@ -148,12 +133,10 @@ export const listAttachmentsTool = {
 export const downloadAttachmentTool = {
   name: 'downloadAttachment',
   description: 'Download an attachment by ID',
-  inputSchema: z.object({
-    attachmentId: z.number({
-      description: 'ID of the attachment to download'
-    }),
+  schema: {
+    attachmentId: z.number().describe('ID of the attachment to download'),
     downloadPath: z.string().optional().describe('Optional local path to save the file')
-  }),
+  },
   
   handler: async ({ attachmentId, downloadPath }) => {
     try {
@@ -187,11 +170,9 @@ export const downloadAttachmentTool = {
 export const deleteAttachmentTool = {
   name: 'deleteAttachment',
   description: 'Delete an attachment by ID',
-  inputSchema: z.object({
-    attachmentId: z.number({
-      description: 'ID of the attachment to delete'
-    })
-  }),
+  schema: {
+    attachmentId: z.number().describe('ID of the attachment to delete')
+  },
   
   handler: async ({ attachmentId }) => {
     try {
@@ -219,8 +200,8 @@ export const deleteAttachmentTool = {
  * Register all attachment tools with the MCP server
  */
 export function registerAttachmentTools(server) {
-  server.tool(uploadAttachmentTool.name, uploadAttachmentTool.inputSchema, uploadAttachmentTool.handler);
-  server.tool(listAttachmentsTool.name, listAttachmentsTool.inputSchema, listAttachmentsTool.handler);
-  server.tool(downloadAttachmentTool.name, downloadAttachmentTool.inputSchema, downloadAttachmentTool.handler);
-  server.tool(deleteAttachmentTool.name, deleteAttachmentTool.inputSchema, deleteAttachmentTool.handler);
+  server.tool(uploadAttachmentTool.name, uploadAttachmentTool.schema, uploadAttachmentTool.handler);
+  server.tool(listAttachmentsTool.name, listAttachmentsTool.schema, listAttachmentsTool.handler);
+  server.tool(downloadAttachmentTool.name, downloadAttachmentTool.schema, downloadAttachmentTool.handler);
+  server.tool(deleteAttachmentTool.name, deleteAttachmentTool.schema, deleteAttachmentTool.handler);
 }
