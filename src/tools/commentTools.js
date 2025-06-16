@@ -24,26 +24,59 @@ export const addCommentTool = {
   schema: {
     itemType: z.enum(['issue', 'user_story', 'task']).describe('Type of item to comment on'),
     itemId: z.number().describe('ID of the issue, user story, or task'),
+    projectIdentifier: z.string().optional().describe('Project ID or slug (required for issues)'),
     comment: z.string().min(1).describe('Comment content to add')
   },
-  handler: async ({ itemType, itemId, comment }) => {
+  handler: async ({ itemType, itemId, projectIdentifier, comment }) => {
     try {
       // 檢查認證狀態
       if (!taigaService.isAuthenticated()) {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
       }
 
-      // 構建簡單的評論數據 - addComment 只需要 comment 字段
+      // 對於issues，projectIdentifier是必需的
+      if (itemType === 'issue' && !projectIdentifier) {
+        return createErrorResponse('Project identifier is required when adding comments to issues. Please provide projectIdentifier parameter.');
+      }
+
+      // 解析項目ID
+      const projectId = projectIdentifier ? await resolveProjectId(projectIdentifier) : null;
+      
+      // 根據itemType獲取實際的item，確保它存在於指定項目中
+      let actualItem;
+      if (itemType === 'issue') {
+        // 對於issue，先嘗試作為ref number，再嘗試作為直接ID
+        try {
+          // 首先嘗試作為reference number (如 #829)
+          actualItem = await taigaService.getIssueByRef(itemId, projectId);
+        } catch (refError) {
+          try {
+            // 如果ref失敗，嘗試作為直接ID
+            actualItem = await taigaService.getIssue(itemId);
+            // 檢查是否屬於正確的項目
+            if (actualItem.project !== projectId) {
+              throw new Error(`Issue #${itemId} does not belong to project ${projectIdentifier}`);
+            }
+          } catch (idError) {
+            throw new Error(`Issue #${itemId} not found in project ${projectIdentifier}. Tried both ref and ID: ${refError.message}, ${idError.message}`);
+          }
+        }
+      } else {
+        // 對於user_story和task，直接使用ID
+        actualItem = { id: itemId };
+      }
+
+      // 構建評論數據
       const commentData = {
         comment: comment
       };
 
       // 發送評論到Taiga (通過歷史API)
-      const response = await taigaService.addComment(itemType, itemId, commentData);
+      const response = await taigaService.addComment(itemType, actualItem.id, commentData);
       
       // 格式化響應
       const result = formatCommentResponse(response, 'added');
-      return createSuccessResponse(`✅ ${SUCCESS_MESSAGES.COMMENT_ADDED}\n\n${result}`);
+      return createSuccessResponse(`${SUCCESS_MESSAGES.COMMENT_ADDED}\n\n${result}`);
       
     } catch (error) {
       return createErrorResponse(`${ERROR_MESSAGES.FAILED_TO_ADD_COMMENT}: ${error.message}`);
@@ -69,7 +102,7 @@ export const listCommentsTool = {
       const comments = filterCommentsFromHistory(history);
       
       if (!comments || comments.length === 0) {
-        return createSuccessResponse(`📝 **${itemType} #${itemId} 評論列表**\n\n❌ 目前沒有評論`);
+        return createSuccessResponse(`**${itemType} #${itemId} 評論列表**\n\n目前沒有評論`);
       }
       
       // 格式化評論列表
@@ -98,7 +131,7 @@ export const editCommentTool = {
       
       // 格式化響應
       const result = formatCommentResponse(response, 'edited');
-      return createSuccessResponse(`✅ ${SUCCESS_MESSAGES.COMMENT_EDITED}\n\n${result}`);
+      return createSuccessResponse(`${SUCCESS_MESSAGES.COMMENT_EDITED}\n\n${result}`);
       
     } catch (error) {
       if (error.response?.status === 404) {
@@ -122,7 +155,7 @@ export const deleteCommentTool = {
       // 刪除評論
       await taigaService.deleteComment(commentId);
       
-      return createSuccessResponse(`✅ ${SUCCESS_MESSAGES.COMMENT_DELETED}\n\n🗑️ 評論 #${commentId} 已成功刪除`);
+      return createSuccessResponse(`${SUCCESS_MESSAGES.COMMENT_DELETED}\n\n評論 #${commentId} 已成功刪除`);
       
     } catch (error) {
       if (error.response?.status === 404) {
@@ -152,18 +185,18 @@ function filterCommentsFromHistory(history) {
  * 格式化評論列表
  */
 function formatCommentsList(comments, itemType, itemId) {
-  let output = `📝 **${itemType.replace('_', ' ')} #${itemId} 評論列表**\n\n`;
-  output += `🔢 共 ${comments.length} 個評論\n\n`;
+  let output = `**${itemType.replace('_', ' ')} #${itemId} 評論列表**\n\n`;
+  output += `共 ${comments.length} 個評論\n\n`;
   
   comments.forEach((comment, index) => {
     const user = getSafeValue(comment, 'user.full_name', comment.user?.username || '未知用戶');
     const createdDate = formatDateTime(comment.created_at);
     const commentText = getSafeValue(comment, 'comment', '無內容');
     
-    output += `**${index + 1}. ${user}** 📅 ${createdDate}\n`;
-    output += `💬 ${commentText}\n`;
+    output += `**${index + 1}. ${user}** ${createdDate}\n`;
+    output += `${commentText}\n`;
     if (comment.id) {
-      output += `🆔 評論ID: ${comment.id}\n`;
+      output += `評論ID: ${comment.id}\n`;
     }
     output += '\n';
   });
@@ -179,12 +212,12 @@ function formatCommentResponse(response, action) {
   const createdDate = formatDateTime(response.created_at);
   const commentText = getSafeValue(response, 'comment', '無內容');
   
-  let output = `📝 **評論已${action === 'added' ? '添加' : '編輯'}**\n\n`;
-  output += `👤 用戶: ${user}\n`;
-  output += `📅 時間: ${createdDate}\n`;
-  output += `💬 內容: ${commentText}\n`;
+  let output = `**評論已${action === 'added' ? '添加' : '編輯'}**\n\n`;
+  output += `用戶: ${user}\n`;
+  output += `時間: ${createdDate}\n`;
+  output += `內容: ${commentText}\n`;
   if (response.id) {
-    output += `🆔 評論ID: ${response.id}`;
+    output += `評論ID: ${response.id}`;
   }
   
   return output;

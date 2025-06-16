@@ -451,6 +451,7 @@ export class TaigaService {
       // Taiga使用歷史API來處理評論
       // 通過更新項目並添加評論來創建評論記錄
       const endpoint = this.getItemEndpoint(itemType);
+      
       const updateData = {
         comment: commentData.comment,
         version: currentVersion
@@ -459,10 +460,6 @@ export class TaigaService {
       const response = await client.patch(`${endpoint}/${itemId}`, updateData);
       return response.data;
     } catch (error) {
-      console.error('Failed to add comment - Full error:', error);
-      console.error('Error response data:', error.response?.data);
-      console.error('Error response status:', error.response?.status);
-      
       // 提供更具体的错误信息
       if (error.response?.status === 400) {
         const errorMsg = error.response?.data?.version ? 
@@ -584,17 +581,15 @@ export class TaigaService {
       const client = await createAuthenticatedClient();
       const endpoint = this.getItemEndpoint(itemType);
       const response = await client.get(`${endpoint}/${itemId}`);
+      
       const version = response.data.version;
       
       if (typeof version !== 'number') {
-        console.error(`Warning: Version is not a number (${typeof version}):`, version);
         return 1; // 默認版本
       }
+      
       return version;
     } catch (error) {
-      console.error('Failed to get item version:', error.message);
-      console.error('Error response:', error.response?.data);
-      
       if (error.response?.status === 404) {
         throw new Error(`${itemType} #${itemId} not found`);
       } else if (error.response?.status === 403) {
@@ -615,9 +610,12 @@ export class TaigaService {
    */
   async uploadAttachment(itemType, itemId, filePath, description) {
     try {
+      console.log('uploadAttachment called with:', { itemType, itemId, filePath, description });
+      
       // Import required modules
       const fs = await import('fs');
       const path = await import('path');
+      const FormData = (await import('form-data')).default;
       
       // Get authenticated client to ensure we have a valid token
       const client = await createAuthenticatedClient();
@@ -625,63 +623,64 @@ export class TaigaService {
       
       // Get attachment endpoint based on item type
       const endpoint = this.getAttachmentEndpoint(itemType);
-      const fullUrl = `${client.defaults.baseURL}${endpoint}`;
       
-      // Check if file exists
-      if (!fs.default.existsSync(filePath)) {
-        throw new Error('File not found');
+      // Validate filePath parameter
+      if (!filePath || typeof filePath !== 'string') {
+        throw new Error(`Invalid file path: ${filePath}`);
       }
       
-      // Read file content directly to avoid form-data callback issues
-      const fileBuffer = fs.default.readFileSync(filePath);
-      const fileName = path.default.basename(filePath);
+      // Check if file exists - support both relative and absolute paths
+      const absolutePath = path.default.isAbsolute(filePath) ? filePath : path.default.resolve(filePath);
+      if (!fs.default.existsSync(absolutePath)) {
+        throw new Error(`File not found: ${absolutePath}`);
+      }
       
-      // Create a simple FormData using browser FormData API
+      // Read file stats and create form data
+      const fileStats = fs.default.statSync(absolutePath);
+      const fileName = path.default.basename(absolutePath);
+      const fileStream = fs.default.createReadStream(absolutePath);
+      
+      // Create FormData instance
       const formData = new FormData();
-      
-      // Create blob from buffer for proper file upload
-      const blob = new Blob([fileBuffer], { 
-        type: 'application/octet-stream' 
-      });
-      
       formData.append('object_id', itemId.toString());
-      formData.append('attached_file', blob, fileName);
-      
+      formData.append('attached_file', fileStream, fileName);
       if (description) {
         formData.append('description', description);
       }
       
-      // Use fetch for better FormData compatibility
-      const response = await fetch(fullUrl, {
-        method: 'POST',
+      // Use axios with FormData
+      const response = await client.post(endpoint, formData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          // Don't set Content-Type, let browser set it with boundary
+          ...formData.getHeaders(),
+          'Authorization': `Bearer ${token}`
         },
-        body: formData,
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
       });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-      }
-      
-      return await response.json();
+      return response.data;
       
     } catch (error) {
       console.error('Failed to upload attachment:', error.message);
+      console.error('Error stack:', error.stack);
       
       // Provide more specific error information
-      if (error.message.includes('cb is not a function')) {
+      if (error.message.includes('ENOENT')) {
+        throw new Error(`File not found: ${filePath}`);
+      } else if (error.message.includes('EACCES')) {
+        throw new Error(`Permission denied accessing file: ${filePath}`);
+      } else if (error.message.includes('cb is not a function')) {
         console.error('Callback error detected - this might be a form-data compatibility issue');
         throw new Error('Upload failed due to form-data callback issue - please check file permissions and format');
-      } else if (error.message.includes('stream')) {
-        throw new Error('Upload failed due to file stream issue - please check file accessibility');
-      } else if (error.message.includes('authentication') || error.message.includes('401')) {
-        throw new Error('Upload failed due to authentication issue - please check Taiga credentials');
+      } else if (error.response?.status === 413) {
+        throw new Error('File too large for upload');
+      } else if (error.response?.status === 401) {
+        throw new Error('Authentication failed - please check credentials');
+      } else if (error.response?.status === 404) {
+        throw new Error('Upload endpoint not found - check item ID and type');
       }
       
-      throw new Error('Failed to upload attachment to Taiga');
+      throw new Error(`Failed to upload attachment to Taiga: ${error.message}`);
     }
   }
 
