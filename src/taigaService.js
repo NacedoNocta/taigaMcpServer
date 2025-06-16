@@ -570,20 +570,20 @@ export class TaigaService {
       const client = await createAuthenticatedClient();
       const fs = await import('fs');
       const path = await import('path');
-      const FormData = await import('form-data');
+      const { default: FormData } = await import('form-data');
       
       // Get attachment endpoint based on item type
       const endpoint = this.getAttachmentEndpoint(itemType);
       
       // Check if file exists
-      if (!fs.existsSync(filePath)) {
+      if (!fs.default.existsSync(filePath)) {
         throw new Error('File not found');
       }
       
       // Create form data
       const form = new FormData();
       form.append('object_id', itemId.toString());
-      form.append('attached_file', fs.createReadStream(filePath));
+      form.append('attached_file', fs.default.createReadStream(filePath));
       
       if (description) {
         form.append('description', description);
@@ -649,10 +649,10 @@ export class TaigaService {
       
       // Determine save path
       const filename = attachment.name || `attachment_${attachmentId}`;
-      const savedPath = downloadPath || path.join(process.cwd(), filename);
+      const savedPath = downloadPath || path.default.join(process.cwd(), filename);
       
       // Save file
-      const writer = fs.createWriteStream(savedPath);
+      const writer = fs.default.createWriteStream(savedPath);
       fileResponse.data.pipe(writer);
       
       return new Promise((resolve, reject) => {
