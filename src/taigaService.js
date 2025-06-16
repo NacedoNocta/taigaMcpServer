@@ -610,7 +610,6 @@ export class TaigaService {
    */
   async uploadAttachment(itemType, itemId, filePath, description) {
     try {
-      console.log('uploadAttachment called with:', { itemType, itemId, filePath, description });
       
       // Import required modules
       const fs = await import('fs');
@@ -661,8 +660,6 @@ export class TaigaService {
       return response.data;
       
     } catch (error) {
-      console.error('Failed to upload attachment:', error.message);
-      console.error('Error stack:', error.stack);
       
       // Provide more specific error information
       if (error.message.includes('ENOENT')) {

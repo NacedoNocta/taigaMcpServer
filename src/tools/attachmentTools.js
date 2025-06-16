@@ -35,10 +35,18 @@ export const uploadAttachmentTool = {
     description: z.string().optional().describe('Optional description for the attachment')
   }),
   
-  handler: async ({ itemType, itemId, projectIdentifier, filePath, description }) => {
+  handler: async (args) => {
     try {
+      // Debug: log received arguments
+      const { itemType, itemId, projectIdentifier, filePath, description } = args;
+      
       if (!taigaService.isAuthenticated()) {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
+      }
+      
+      // Validate required parameters
+      if (!filePath) {
+        return createErrorResponse(`Missing required parameter: filePath. Received arguments: ${JSON.stringify(args)}`);
       }
 
       // 對於issues，projectIdentifier是必需的
