@@ -28,12 +28,14 @@ export const addCommentTool = {
   },
   handler: async ({ itemType, itemId, comment }) => {
     try {
-      // 根據不同類型構建評論數據
+      // 檢查認證狀態
+      if (!taigaService.isAuthenticated()) {
+        return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
+      }
+
+      // 構建簡單的評論數據 - addComment 只需要 comment 字段
       const commentData = {
-        comment: comment,
-        object_id: itemId,
-        content_type: getContentTypeForItem(itemType),
-        user: await taigaService.getCurrentUserId()
+        comment: comment
       };
 
       // 發送評論到Taiga (通過歷史API)
@@ -131,17 +133,6 @@ export const deleteCommentTool = {
   }
 };
 
-/**
- * 獲取項目類型對應的content_type
- */
-function getContentTypeForItem(itemType) {
-  const contentTypes = {
-    'issue': 'issue',
-    'user_story': 'userstory', 
-    'task': 'task'
-  };
-  return contentTypes[itemType] || 'issue';
-}
 
 /**
  * 從歷史記錄中過濾出評論
@@ -150,7 +141,8 @@ function filterCommentsFromHistory(history) {
   if (!Array.isArray(history)) return [];
   
   return history.filter(entry => 
-    entry.type === 'change' && 
+    // Taiga API returns type as number 1 for changes, not string 'change'
+    entry.type === 1 && 
     entry.comment && 
     entry.comment.trim().length > 0
   );

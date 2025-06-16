@@ -6,6 +6,21 @@ import { API_ENDPOINTS, ERROR_MESSAGES } from './constants.js';
  */
 export class TaigaService {
   /**
+   * Check if user is authenticated
+   * @returns {boolean} - Whether user has valid authentication
+   */
+  isAuthenticated() {
+    try {
+      // Check if we have the required environment variables
+      const username = process.env.TAIGA_USERNAME;
+      const password = process.env.TAIGA_PASSWORD;
+      return !!(username && password);
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
    * Get a list of all projects the user has access to
    * @returns {Promise<Array>} - List of projects
    */
@@ -430,19 +445,37 @@ export class TaigaService {
     try {
       const client = await createAuthenticatedClient();
       
+      // 首先获取当前项目版本（必需用于版本控制）
+      const currentVersion = await this.getItemVersion(itemType, itemId);
+      
       // Taiga使用歷史API來處理評論
       // 通過更新項目並添加評論來創建評論記錄
       const endpoint = this.getItemEndpoint(itemType);
       const updateData = {
         comment: commentData.comment,
-        version: await this.getItemVersion(itemType, itemId)
+        version: currentVersion
       };
       
       const response = await client.patch(`${endpoint}/${itemId}`, updateData);
       return response.data;
     } catch (error) {
-      console.error('Failed to add comment:', error.message);
-      throw new Error('Failed to add comment to Taiga');
+      console.error('Failed to add comment - Full error:', error);
+      console.error('Error response data:', error.response?.data);
+      console.error('Error response status:', error.response?.status);
+      
+      // 提供更具体的错误信息
+      if (error.response?.status === 400) {
+        const errorMsg = error.response?.data?.version ? 
+          'Version parameter is invalid. The item may have been modified by another user.' :
+          'Bad request. Please check the comment data format.';
+        throw new Error(`Failed to add comment to Taiga: ${errorMsg}`);
+      } else if (error.response?.status === 403) {
+        throw new Error('Failed to add comment to Taiga: Permission denied. Check your access rights.');
+      } else if (error.response?.status === 404) {
+        throw new Error(`Failed to add comment to Taiga: ${itemType} #${itemId} not found.`);
+      } else {
+        throw new Error(`Failed to add comment to Taiga: ${error.message}`);
+      }
     }
   }
 
@@ -551,10 +584,24 @@ export class TaigaService {
       const client = await createAuthenticatedClient();
       const endpoint = this.getItemEndpoint(itemType);
       const response = await client.get(`${endpoint}/${itemId}`);
-      return response.data.version || 1;
+      const version = response.data.version;
+      
+      if (typeof version !== 'number') {
+        console.error(`Warning: Version is not a number (${typeof version}):`, version);
+        return 1; // 默認版本
+      }
+      return version;
     } catch (error) {
       console.error('Failed to get item version:', error.message);
-      return 1; // 默認版本
+      console.error('Error response:', error.response?.data);
+      
+      if (error.response?.status === 404) {
+        throw new Error(`${itemType} #${itemId} not found`);
+      } else if (error.response?.status === 403) {
+        throw new Error(`Permission denied accessing ${itemType} #${itemId}`);
+      } else {
+        throw new Error(`Failed to get ${itemType} version: ${error.message}`);
+      }
     }
   }
 
@@ -568,10 +615,11 @@ export class TaigaService {
    */
   async uploadAttachment(itemType, itemId, filePath, description) {
     try {
-      // Import required modules
+      // Import required modules synchronously to avoid async import issues
       const fs = await import('fs');
       const path = await import('path');
-      const { default: FormData } = await import('form-data');
+      const FormDataModule = await import('form-data');
+      const FormData = FormDataModule.default;
       
       // Get authenticated client to ensure we have a valid token
       const client = await createAuthenticatedClient();
@@ -579,41 +627,63 @@ export class TaigaService {
       
       // Get attachment endpoint based on item type
       const endpoint = this.getAttachmentEndpoint(itemType);
-      const fullUrl = `${client.defaults.baseURL}${endpoint}`;
-      
       
       // Check if file exists
       if (!fs.default.existsSync(filePath)) {
         throw new Error('File not found');
       }
       
-      // Create form data
+      // Create form data with error handling
       const form = new FormData();
-      form.append('object_id', itemId.toString());
-      form.append('attached_file', fs.default.createReadStream(filePath));
       
-      if (description) {
-        form.append('description', description);
+      // Wrap form operations in try-catch to catch callback errors
+      try {
+        form.append('object_id', itemId.toString());
+        
+        // Create file stream with proper error handling
+        const fileStream = fs.default.createReadStream(filePath);
+        
+        // Handle stream errors that might cause callback issues
+        fileStream.on('error', (streamError) => {
+          console.error('File stream error:', streamError.message);
+        });
+        
+        form.append('attached_file', fileStream);
+        
+        if (description) {
+          form.append('description', description);
+        }
+      } catch (formError) {
+        console.error('FormData append error:', formError.message);
+        throw new Error(`Form data creation failed: ${formError.message}`);
       }
       
-      // Use fetch instead of axios for better form-data compatibility
-      const response = await fetch(fullUrl, {
-        method: 'POST',
+      // Use axios with manual form-data setup to avoid callback issues
+      const response = await client.post(endpoint, form, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          ...form.getHeaders(),
+          ...form.getHeaders()
         },
-        body: form,
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+        timeout: 60000 // 60 second timeout for large files
       });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-      }
+      return response.data;
       
-      return await response.json();
     } catch (error) {
       console.error('Failed to upload attachment:', error.message);
+      
+      // Provide more specific error information
+      if (error.message.includes('cb is not a function')) {
+        console.error('Callback error detected - this might be a form-data compatibility issue');
+        throw new Error('Upload failed due to form-data callback issue - please check file permissions and format');
+      } else if (error.message.includes('stream')) {
+        throw new Error('Upload failed due to file stream issue - please check file accessibility');
+      } else if (error.message.includes('authentication') || error.message.includes('401')) {
+        throw new Error('Upload failed due to authentication issue - please check Taiga credentials');
+      }
+      
       throw new Error('Failed to upload attachment to Taiga');
     }
   }
