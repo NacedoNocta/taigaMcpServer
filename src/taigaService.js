@@ -347,19 +347,12 @@ export class TaigaService {
    */
   async getIssue(issueId) {
     try {
-      console.log('🔍 taigaService.getIssue called with ID:', issueId);
       const client = await createAuthenticatedClient();
       const url = `${API_ENDPOINTS.ISSUES}/${issueId}`;
-      console.log('📡 Making request to:', url);
-      
       const response = await client.get(url);
-      console.log('✅ Issue API response status:', response.status);
-      console.log('📋 Issue data keys:', Object.keys(response.data));
-      
       return response.data;
     } catch (error) {
-      console.error(`❌ Failed to get issue ${issueId}:`, error.message);
-      console.error('Error response:', error.response?.status, error.response?.data);
+      console.error(`Failed to get issue ${issueId}:`, error.message);
       throw new Error(ERROR_MESSAGES.FAILED_TO_GET_ISSUE);
     }
   }
@@ -372,20 +365,13 @@ export class TaigaService {
    */
   async getIssueByRef(ref, projectId) {
     try {
-      console.log('🔍 taigaService.getIssueByRef called with:', { ref, projectId });
       const client = await createAuthenticatedClient();
       const url = `${API_ENDPOINTS.ISSUES}/by_ref`;
       const params = { ref, project: projectId };
-      console.log('📡 Making request to:', url, 'with params:', params);
-      
       const response = await client.get(url, { params });
-      console.log('✅ Issue by ref API response status:', response.status);
-      console.log('📋 Issue by ref data keys:', Object.keys(response.data));
-      
       return response.data;
     } catch (error) {
-      console.error(`❌ Failed to get issue by ref ${ref}:`, error.message);
-      console.error('Error response:', error.response?.status, error.response?.data);
+      console.error(`Failed to get issue by ref ${ref}:`, error.message);
       throw new Error('Failed to get issue by reference from Taiga');
     }
   }
@@ -595,8 +581,6 @@ export class TaigaService {
       const endpoint = this.getAttachmentEndpoint(itemType);
       const fullUrl = `${client.defaults.baseURL}${endpoint}`;
       
-      console.log('🔍 uploadAttachment called with:', { itemType, itemId, filePath, description });
-      console.log('📡 Upload URL:', fullUrl);
       
       // Check if file exists
       if (!fs.default.existsSync(filePath)) {
@@ -622,18 +606,14 @@ export class TaigaService {
         body: form,
       });
       
-      console.log('✅ Upload response status:', response.status);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Upload failed:', errorText);
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
       
       return await response.json();
     } catch (error) {
-      console.error('❌ Failed to upload attachment:', error.message);
-      console.error('Error stack:', error.stack);
+      console.error('Failed to upload attachment:', error.message);
       throw new Error('Failed to upload attachment to Taiga');
     }
   }

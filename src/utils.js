@@ -28,24 +28,16 @@ export async function resolveProjectId(projectIdentifier) {
  * @returns {Promise<Object>} - Issue object
  */
 export async function resolveIssue(issueIdentifier, projectIdentifier) {
-  console.log('🔍 resolveIssue called with:', { issueIdentifier, projectIdentifier });
-  
   if (issueIdentifier.startsWith('#')) {
-    console.log('📋 Using reference number format');
     if (!projectIdentifier) {
       throw new Error('Project identifier is required when using issue reference number');
     }
     
     const projectId = await resolveProjectId(projectIdentifier);
-    console.log('✅ Project resolved:', projectId);
-    
     const ref = issueIdentifier.substring(1);
-    console.log('🔢 Getting issue by ref:', ref);
-    
     return await taigaService.getIssueByRef(ref, projectId);
   }
   
-  console.log('🆔 Using direct ID format');
   return await taigaService.getIssue(issueIdentifier);
 }
 
