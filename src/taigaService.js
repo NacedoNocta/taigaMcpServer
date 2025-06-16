@@ -615,11 +615,9 @@ export class TaigaService {
    */
   async uploadAttachment(itemType, itemId, filePath, description) {
     try {
-      // Import required modules synchronously to avoid async import issues
+      // Import required modules
       const fs = await import('fs');
       const path = await import('path');
-      const FormDataModule = await import('form-data');
-      const FormData = FormDataModule.default;
       
       // Get authenticated client to ensure we have a valid token
       const client = await createAuthenticatedClient();
@@ -627,49 +625,48 @@ export class TaigaService {
       
       // Get attachment endpoint based on item type
       const endpoint = this.getAttachmentEndpoint(itemType);
+      const fullUrl = `${client.defaults.baseURL}${endpoint}`;
       
       // Check if file exists
       if (!fs.default.existsSync(filePath)) {
         throw new Error('File not found');
       }
       
-      // Create form data with error handling
-      const form = new FormData();
+      // Read file content directly to avoid form-data callback issues
+      const fileBuffer = fs.default.readFileSync(filePath);
+      const fileName = path.default.basename(filePath);
       
-      // Wrap form operations in try-catch to catch callback errors
-      try {
-        form.append('object_id', itemId.toString());
-        
-        // Create file stream with proper error handling
-        const fileStream = fs.default.createReadStream(filePath);
-        
-        // Handle stream errors that might cause callback issues
-        fileStream.on('error', (streamError) => {
-          console.error('File stream error:', streamError.message);
-        });
-        
-        form.append('attached_file', fileStream);
-        
-        if (description) {
-          form.append('description', description);
-        }
-      } catch (formError) {
-        console.error('FormData append error:', formError.message);
-        throw new Error(`Form data creation failed: ${formError.message}`);
-      }
+      // Create a simple FormData using browser FormData API
+      const formData = new FormData();
       
-      // Use axios with manual form-data setup to avoid callback issues
-      const response = await client.post(endpoint, form, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          ...form.getHeaders()
-        },
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-        timeout: 60000 // 60 second timeout for large files
+      // Create blob from buffer for proper file upload
+      const blob = new Blob([fileBuffer], { 
+        type: 'application/octet-stream' 
       });
       
-      return response.data;
+      formData.append('object_id', itemId.toString());
+      formData.append('attached_file', blob, fileName);
+      
+      if (description) {
+        formData.append('description', description);
+      }
+      
+      // Use fetch for better FormData compatibility
+      const response = await fetch(fullUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // Don't set Content-Type, let browser set it with boundary
+        },
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+      
+      return await response.json();
       
     } catch (error) {
       console.error('Failed to upload attachment:', error.message);
