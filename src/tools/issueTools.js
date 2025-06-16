@@ -54,7 +54,10 @@ export const getIssueTool = {
   },
   handler: async ({ issueIdentifier, projectIdentifier }) => {
     try {
+      console.log('🔍 getIssue called with:', { issueIdentifier, projectIdentifier });
+      
       const issue = await resolveIssue(issueIdentifier, projectIdentifier);
+      console.log('✅ Issue resolved successfully:', { id: issue.id, ref: issue.ref, subject: issue.subject });
 
       const issueDetails = `Issue Details: #${issue.ref} - ${issue.subject}
 
@@ -80,6 +83,8 @@ ${getSafeValue(issue.description, STATUS_LABELS.NO_DESCRIPTION)}
 
       return createSuccessResponse(issueDetails);
     } catch (error) {
+      console.error('❌ getIssue error:', error);
+      console.error('Error stack:', error.stack);
       return createErrorResponse(`Failed to get issue details: ${error.message}`);
     }
   }
