@@ -17,6 +17,49 @@ import {
 const taigaService = new TaigaService();
 
 /**
+ * 解析並獲取實際的item
+ * @param {string} itemType - 項目類型
+ * @param {number} itemId - 項目ID
+ * @param {string} projectIdentifier - 項目識別符
+ * @returns {Promise<Object>} - 實際的item
+ */
+async function resolveAndGetItem(itemType, itemId, projectIdentifier) {
+  // 對於issues，projectIdentifier是必需的
+  if (itemType === 'issue' && !projectIdentifier) {
+    throw new Error('Project identifier is required when working with issues. Please provide projectIdentifier parameter.');
+  }
+
+  // 解析項目ID
+  const projectId = projectIdentifier ? await resolveProjectId(projectIdentifier) : null;
+  
+  // 根據itemType獲取實際的item，確保它存在於指定項目中
+  let actualItem;
+  if (itemType === 'issue') {
+    // 對於issue，先嘗試作為ref number，再嘗試作為直接ID
+    try {
+      // 首先嘗試作為reference number (如 #829)
+      actualItem = await taigaService.getIssueByRef(itemId, projectId);
+    } catch (refError) {
+      try {
+        // 如果ref失敗，嘗試作為直接ID
+        actualItem = await taigaService.getIssue(itemId);
+        // 檢查是否屬於正確的項目
+        if (actualItem.project !== projectId) {
+          throw new Error(`Issue #${itemId} does not belong to project ${projectIdentifier}`);
+        }
+      } catch (idError) {
+        throw new Error(`Issue #${itemId} not found in project ${projectIdentifier}. Tried both ref and ID: ${refError.message}, ${idError.message}`);
+      }
+    }
+  } else {
+    // 對於user_story和task，直接使用ID
+    actualItem = { id: itemId };
+  }
+
+  return actualItem;
+}
+
+/**
  * 添加評論工具
  */
 export const addCommentTool = {
@@ -34,37 +77,8 @@ export const addCommentTool = {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
       }
 
-      // 對於issues，projectIdentifier是必需的
-      if (itemType === 'issue' && !projectIdentifier) {
-        return createErrorResponse('Project identifier is required when adding comments to issues. Please provide projectIdentifier parameter.');
-      }
-
-      // 解析項目ID
-      const projectId = projectIdentifier ? await resolveProjectId(projectIdentifier) : null;
-      
-      // 根據itemType獲取實際的item，確保它存在於指定項目中
-      let actualItem;
-      if (itemType === 'issue') {
-        // 對於issue，先嘗試作為ref number，再嘗試作為直接ID
-        try {
-          // 首先嘗試作為reference number (如 #829)
-          actualItem = await taigaService.getIssueByRef(itemId, projectId);
-        } catch (refError) {
-          try {
-            // 如果ref失敗，嘗試作為直接ID
-            actualItem = await taigaService.getIssue(itemId);
-            // 檢查是否屬於正確的項目
-            if (actualItem.project !== projectId) {
-              throw new Error(`Issue #${itemId} does not belong to project ${projectIdentifier}`);
-            }
-          } catch (idError) {
-            throw new Error(`Issue #${itemId} not found in project ${projectIdentifier}. Tried both ref and ID: ${refError.message}, ${idError.message}`);
-          }
-        }
-      } else {
-        // 對於user_story和task，直接使用ID
-        actualItem = { id: itemId };
-      }
+      // 解析並獲取實際的item
+      const actualItem = await resolveAndGetItem(itemType, itemId, projectIdentifier);
 
       // 構建評論數據
       const commentData = {
@@ -91,12 +105,21 @@ export const listCommentsTool = {
   name: 'listComments',
   schema: {
     itemType: z.enum(['issue', 'user_story', 'task']).describe('Type of item to get comments for'),
-    itemId: z.number().describe('ID of the issue, user story, or task')
+    itemId: z.number().describe('ID of the issue, user story, or task'),
+    projectIdentifier: z.string().optional().describe('Project ID or slug (required for issues)')
   },
-  handler: async ({ itemType, itemId }) => {
+  handler: async ({ itemType, itemId, projectIdentifier }) => {
     try {
+      // 檢查認證狀態
+      if (!taigaService.isAuthenticated()) {
+        return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
+      }
+
+      // 解析並獲取實際的item
+      const actualItem = await resolveAndGetItem(itemType, itemId, projectIdentifier);
+
       // 獲取項目歷史記錄（包含評論）
-      const history = await taigaService.getItemHistory(itemType, itemId);
+      const history = await taigaService.getItemHistory(itemType, actualItem.id);
       
       // 過濾出評論相關的歷史記錄
       const comments = filterCommentsFromHistory(history);
