@@ -164,6 +164,92 @@ Project: ${getSafeValue(createdIssue.project_extra_info?.name)}`;
 };
 
 /**
+ * Tool to add issue to a sprint (milestone)
+ */
+export const addIssueToSprintTool = {
+  name: 'addIssueToSprint',
+  schema: {
+    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123" or "#45")'),
+    sprintIdentifier: z.string().describe('Sprint ID or name (or "remove" to remove from sprint)'),
+    projectIdentifier: z.string().optional().describe('Project ID or slug (required if using reference number)'),
+  },
+  handler: async ({ issueIdentifier, sprintIdentifier, projectIdentifier }) => {
+    try {
+      // Resolve the issue first
+      const issue = await resolveIssue(issueIdentifier, projectIdentifier);
+      
+      let milestoneId = null;
+      
+      // Handle sprint removal
+      if (sprintIdentifier.toLowerCase() === 'remove' || sprintIdentifier.toLowerCase() === 'none') {
+        milestoneId = null;
+      } else {
+        // Get project ID for sprint lookup
+        const projectId = issue.project || (projectIdentifier ? await resolveProjectId(projectIdentifier) : null);
+        if (!projectId) {
+          return createErrorResponse('Could not determine project ID for sprint lookup');
+        }
+        
+        // Try to find sprint by ID first, then by name
+        let sprint = null;
+        
+        // If it's a number, try to get sprint by ID
+        if (!isNaN(sprintIdentifier)) {
+          try {
+            sprint = await taigaService.getMilestone(sprintIdentifier);
+          } catch (error) {
+            // If getting by ID fails, we'll try by name below
+          }
+        }
+        
+        // If not found by ID or not a number, search by name
+        if (!sprint) {
+          const sprints = await taigaService.listMilestones(projectId);
+          sprint = sprints.find(s => 
+            s.name === sprintIdentifier || 
+            s.name.toLowerCase() === sprintIdentifier.toLowerCase()
+          );
+        }
+        
+        if (!sprint) {
+          const sprints = await taigaService.listMilestones(projectId);
+          const availableSprints = sprints.map(s => 
+            `- ${s.name} (ID: ${s.id})`
+          ).join('\n');
+          
+          return createErrorResponse(
+            `Sprint "${sprintIdentifier}" not found in project. Available sprints:\n${availableSprints}`
+          );
+        }
+        
+        milestoneId = sprint.id;
+      }
+      
+      // Update the issue with the new milestone
+      const updateData = {
+        milestone: milestoneId
+      };
+      
+      const updatedIssue = await taigaService.updateIssue(issue.id, updateData);
+      
+      const sprintDetails = `${SUCCESS_MESSAGES.ISSUE_CREATED.replace('created', 'sprint assignment updated')}
+
+Issue: #${updatedIssue.ref} - ${updatedIssue.subject}
+Sprint: ${milestoneId ? 
+  (updatedIssue.milestone_extra_info?.name || 'Unknown sprint') : 
+  'Removed from sprint'
+}
+Project: ${getSafeValue(updatedIssue.project_extra_info?.name)}
+Status: ${getSafeValue(updatedIssue.status_extra_info?.name)}`;
+
+      return createSuccessResponse(sprintDetails);
+    } catch (error) {
+      return createErrorResponse(`Failed to add issue to sprint: ${error.message}`);
+    }
+  }
+};
+
+/**
  * Tool to assign issue to a user
  */
 export const assignIssueTool = {

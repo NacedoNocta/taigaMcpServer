@@ -8,7 +8,7 @@ import { authenticateTool } from './authTools.js';
 import { listProjectsTool, getProjectTool } from './projectTools.js';
 import { listUserStoriesTool, createUserStoryTool } from './userStoryTools.js';
 import { createTaskTool } from './taskTools.js';
-import { listIssuesTool, getIssueTool, createIssueTool, assignIssueTool } from './issueTools.js';
+import { listIssuesTool, getIssueTool, createIssueTool, addIssueToSprintTool, assignIssueTool } from './issueTools.js';
 import { listSprintsTool, getSprintStatsTool, createSprintTool, getIssuesBySprintTool } from './sprintTools.js';
 import { batchCreateIssuesTool, batchCreateUserStoriesTool, batchCreateTasksTool } from './batchTools.js';
 import { advancedSearchTool, queryHelpTool, validateQueryTool } from './advancedSearchTools.js';
@@ -49,6 +49,7 @@ export const toolRegistry = {
     listIssuesTool,
     getIssueTool,
     createIssueTool,
+    addIssueToSprintTool,
     assignIssueTool
   ],
   
