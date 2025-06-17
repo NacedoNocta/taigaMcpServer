@@ -306,6 +306,49 @@ export class TaigaService {
   }
 
   /**
+   * Get project members (for issue assignment)
+   * @param {string} projectId - Project ID
+   * @returns {Promise<Array>} - List of project members
+   */
+  async getProjectMembers(projectId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const response = await client.get(API_ENDPOINTS.MEMBERSHIPS, {
+        params: { project: projectId }
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to get project members for project ${projectId}:`, error.message);
+      throw new Error('Failed to get project members from Taiga');
+    }
+  }
+
+  /**
+   * Update an issue
+   * @param {number} issueId - Issue ID
+   * @param {Object} updateData - Data to update
+   * @returns {Promise<Object>} - Updated issue
+   */
+  async updateIssue(issueId, updateData) {
+    try {
+      const client = await createAuthenticatedClient();
+      
+      // Get current issue to get version for update
+      const currentIssue = await this.getIssue(issueId);
+      const dataWithVersion = {
+        ...updateData,
+        version: currentIssue.version
+      };
+
+      const response = await client.patch(`${API_ENDPOINTS.ISSUES}/${issueId}`, dataWithVersion);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update issue:', error.message);
+      throw new Error('Failed to update issue in Taiga');
+    }
+  }
+
+  /**
    * List milestones (sprints) for a project
    * @param {string} projectId - Project ID
    * @returns {Promise<Array>} - List of milestones

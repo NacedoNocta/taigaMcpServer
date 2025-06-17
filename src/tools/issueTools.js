@@ -162,3 +162,78 @@ Project: ${getSafeValue(createdIssue.project_extra_info?.name)}`;
     }
   }
 };
+
+/**
+ * Tool to assign issue to a user
+ */
+export const assignIssueTool = {
+  name: 'assignIssue',
+  schema: {
+    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123" or "#45")'),
+    assignee: z.string().describe('Username or user ID to assign the issue to (or "unassign" to remove assignment)'),
+    projectIdentifier: z.string().optional().describe('Project ID or slug (required if using reference number)'),
+  },
+  handler: async ({ issueIdentifier, assignee, projectIdentifier }) => {
+    try {
+      // Resolve the issue first
+      const issue = await resolveIssue(issueIdentifier, projectIdentifier);
+      
+      let assignedToId = null;
+      
+      // Handle unassignment
+      if (assignee.toLowerCase() === 'unassign' || assignee.toLowerCase() === 'none') {
+        assignedToId = null;
+      } else {
+        // Get project members to find the assignee
+        const projectId = issue.project || (projectIdentifier ? await resolveProjectId(projectIdentifier) : null);
+        if (!projectId) {
+          return createErrorResponse('Could not determine project ID for member lookup');
+        }
+        
+        const members = await taigaService.getProjectMembers(projectId);
+        
+        // Try to find user by full name, email, or user ID
+        const member = members.find(m => 
+          m.full_name === assignee || 
+          m.user === parseInt(assignee) ||
+          m.email === assignee ||
+          m.user_email === assignee ||
+          m.full_name?.toLowerCase() === assignee.toLowerCase()
+        );
+        
+        if (!member) {
+          const availableMembers = members.map(m => 
+            `- ${m.full_name} (${m.user_email || m.email}) - ID: ${m.user}`
+          ).join('\n');
+          
+          return createErrorResponse(
+            `User "${assignee}" not found in project. Available members:\n${availableMembers}`
+          );
+        }
+        
+        assignedToId = member.user;
+      }
+      
+      // Update the issue
+      const updateData = {
+        assigned_to: assignedToId
+      };
+      
+      const updatedIssue = await taigaService.updateIssue(issue.id, updateData);
+      
+      const assignmentDetails = `${SUCCESS_MESSAGES.ISSUE_CREATED.replace('created', 'assignment updated')}
+
+Issue: #${updatedIssue.ref} - ${updatedIssue.subject}
+Assigned to: ${assignedToId ? 
+  (updatedIssue.assigned_to_extra_info?.full_name || updatedIssue.assigned_to_extra_info?.username || 'Unknown user') : 
+  'Unassigned'
+}
+Project: ${getSafeValue(updatedIssue.project_extra_info?.name)}
+Status: ${getSafeValue(updatedIssue.status_extra_info?.name)}`;
+
+      return createSuccessResponse(assignmentDetails);
+    } catch (error) {
+      return createErrorResponse(`Failed to assign issue: ${error.message}`);
+    }
+  }
+};

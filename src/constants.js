@@ -157,6 +157,7 @@ export const API_ENDPOINTS = {
   EPICS: '/epics',
   WIKI: '/wiki',
   WIKI_ATTACHMENTS: '/wiki/attachments',
+  MEMBERSHIPS: '/memberships',
 };
 
 export const RESPONSE_TEMPLATES = {
