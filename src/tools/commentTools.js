@@ -212,9 +212,9 @@ function formatCommentsList(comments, itemType, itemId) {
   output += `共 ${comments.length} 個評論\n\n`;
   
   comments.forEach((comment, index) => {
-    const user = getSafeValue(comment, 'user.full_name', comment.user?.username || '未知用戶');
+    const user = comment.user?.full_name || comment.user?.username || '未知用戶';
     const createdDate = formatDateTime(comment.created_at);
-    const commentText = getSafeValue(comment, 'comment', '無內容');
+    const commentText = comment.comment || '無內容';
     
     output += `**${index + 1}. ${user}** ${createdDate}\n`;
     output += `${commentText}\n`;
@@ -231,9 +231,9 @@ function formatCommentsList(comments, itemType, itemId) {
  * 格式化單個評論響應
  */
 function formatCommentResponse(response, action) {
-  const user = getSafeValue(response, 'user.full_name', response.user?.username || '未知用戶');
+  const user = response.user?.full_name || response.user?.username || '未知用戶';
   const createdDate = formatDateTime(response.created_at);
-  const commentText = getSafeValue(response, 'comment', '無內容');
+  const commentText = response.comment || '無內容';
   
   let output = `**評論已${action === 'added' ? '添加' : '編輯'}**\n\n`;
   output += `用戶: ${user}\n`;
