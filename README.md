@@ -44,8 +44,10 @@ A powerful **Model Context Protocol (MCP)** server that enables natural language
 - **Real-time Updates**: Immediate comment synchronization across team
 
 ### 📎 File Attachment Management
-- **File Upload**: Attach documents, images, and resources to work items
-- **Multi-format Support**: Support for all major file types
+- **Flexible File Upload**: Support both file path and Base64 upload methods
+- **Claude Client Integration**: Optimized for Claude Desktop file handling
+- **Multi-format Support**: Images, documents, PDFs, and all major file types
+- **Smart Path Resolution**: Automatic file path detection from common locations
 - **Download Management**: Efficient file download with path management
 - **Storage Organization**: Clean attachment management with descriptions
 
@@ -273,6 +275,9 @@ For self-hosted Taiga instances:
 🗣️ "Upload design.pdf to user story #456 with description 'UI mockup v2'"
 📎 Returns: File uploaded successfully with size and metadata
 
+🗣️ "Upload screenshot.png to issue #123 in project MyApp"
+📸 Returns: Image file attached with automatic MIME type detection
+
 🗣️ "List all attachments for issue #789"
 📂 Returns: Complete attachment list with filenames, sizes, and upload dates
 
@@ -281,6 +286,33 @@ For self-hosted Taiga instances:
 
 🗣️ "Delete attachment #456"
 🗑️ Returns: Attachment removed from the project
+```
+
+### File Upload Methods
+The system supports two upload methods optimized for different use cases:
+
+**Method 1: File Path (Recommended for Claude Desktop)**
+```json
+{
+  "itemType": "issue",
+  "itemId": 123,
+  "projectIdentifier": "MyApp",
+  "filePath": "design.pdf",
+  "description": "UI mockup v2"
+}
+```
+
+**Method 2: Base64 Data (For programmatic use)**
+```json
+{
+  "itemType": "issue", 
+  "itemId": 123,
+  "projectIdentifier": "MyApp",
+  "fileData": "base64_encoded_file_content",
+  "fileName": "design.pdf",
+  "mimeType": "application/pdf",
+  "description": "UI mockup v2"
+}
 ```
 
 ### Epic Management Examples
@@ -384,12 +416,12 @@ For self-hosted Taiga instances:
 | `deleteComment` | Delete comments |
 
 ### 📎 File Attachments (4 tools)
-| Tool | Description |
-|------|-------------|
-| `uploadAttachment` | Upload files to issues, stories, or tasks |
-| `listAttachments` | View attachment list for items |
-| `downloadAttachment` | Download attachments by ID |
-| `deleteAttachment` | Delete attachments |
+| Tool | Description | Key Features |
+|------|-------------|--------------|
+| `uploadAttachment` | Upload files to issues, stories, or tasks | Dual method support (file path/Base64), smart path resolution |
+| `listAttachments` | View attachment list for items | Complete metadata with file sizes and upload dates |
+| `downloadAttachment` | Download attachments by ID | Flexible download path management |
+| `deleteAttachment` | Delete attachments | Safe deletion with confirmation |
 
 ### 🏛️ Epic Management (6 tools)
 | Tool | Description |
@@ -420,8 +452,8 @@ For self-hosted Taiga instances:
 - **🎯 Sprint-Focused**: Advanced sprint-issue relationship tracking  
 - **🛡️ Secure**: Environment-based credential management
 - **🚀 Batch Operations**: Efficient bulk operations for large projects
-- **💬 Team Collaboration**: Complete comment system for enhanced communication
-- **📎 File Management**: Full attachment lifecycle with multi-format support
+- **💬 Team Collaboration**: Complete comment system for enhanced communication  
+- **📎 File Management**: Dual upload methods (file path/Base64) with Claude Desktop optimization
 - **🏛️ Enterprise-Ready**: Epic management for large-scale project organization
 - **📖 Knowledge Management**: Complete Wiki system for project documentation
 - **🔍 Advanced Search**: SQL-like query syntax for complex data filtering

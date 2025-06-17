@@ -604,16 +604,16 @@ export class TaigaService {
    * Upload attachment to an item (issue, user story, or task)
    * @param {string} itemType - Type of item ('issue', 'user_story', 'task')
    * @param {number} itemId - ID of the item
-   * @param {string} filePath - Path to the file to upload
+   * @param {string} fileData - Base64 encoded file data
+   * @param {string} fileName - Original file name
+   * @param {string} [mimeType] - MIME type of the file
    * @param {string} [description] - Optional description for the attachment
    * @returns {Promise<Object>} - Created attachment
    */
-  async uploadAttachment(itemType, itemId, filePath, description) {
+  async uploadAttachment(itemType, itemId, fileData, fileName, mimeType, description) {
     try {
       
       // Import required modules
-      const fs = await import('fs');
-      const path = await import('path');
       const FormData = (await import('form-data')).default;
       
       // Get authenticated client to ensure we have a valid token
@@ -622,6 +622,94 @@ export class TaigaService {
       
       // Get attachment endpoint based on item type
       const endpoint = this.getAttachmentEndpoint(itemType);
+      
+      // Validate required parameters
+      if (!fileData || typeof fileData !== 'string') {
+        throw new Error(`Invalid file data: fileData must be a base64 encoded string`);
+      }
+      
+      if (!fileName || typeof fileName !== 'string') {
+        throw new Error(`Invalid file name: fileName is required`);
+      }
+      
+      // Convert base64 to buffer
+      let fileBuffer;
+      try {
+        // Remove data URI prefix if present (e.g., "data:image/jpeg;base64,")
+        const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
+        fileBuffer = Buffer.from(base64Data, 'base64');
+      } catch (error) {
+        throw new Error(`Invalid base64 data: ${error.message}`);
+      }
+      
+      // Create FormData instance
+      const formData = new FormData();
+      formData.append('object_id', itemId.toString());
+      
+      // Append file buffer - 使用更簡單的格式
+      // 某些版本的 form-data 可能對第三個參數格式敏感
+      formData.append('attached_file', fileBuffer, fileName);
+      
+      if (description) {
+        formData.append('description', description);
+      }
+      
+      // 嘗試添加項目ID（可能是必需的）
+      try {
+        const itemData = await this.getItemData(itemType, itemId);
+        if (itemData && itemData.project) {
+          formData.append('project', itemData.project.toString());
+        }
+      } catch (projectError) {
+        // 靜默忽略項目ID獲取失敗，繼續上傳
+      }
+
+      // Use axios with FormData (client already has auth headers)
+      const response = await client.post(endpoint, formData, {
+        headers: {
+          ...formData.getHeaders()
+          // Don't add Authorization header - client already has it
+        },
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+      });
+      
+      return response.data;
+      
+    } catch (error) {
+      
+      // Provide more specific error information
+      if (error.message.includes('Invalid base64')) {
+        throw new Error(`Invalid file data format: ${error.message}`);
+      } else if (error.message.includes('cb is not a function')) {
+        console.error('Callback error detected - this might be a form-data compatibility issue');
+        throw new Error('Upload failed due to form-data callback issue');
+      } else if (error.response?.status === 413) {
+        throw new Error('File too large for upload');
+      } else if (error.response?.status === 401) {
+        throw new Error('Authentication failed - please check credentials');
+      } else if (error.response?.status === 404) {
+        throw new Error('Upload endpoint not found - check item ID and type');
+      }
+      
+      throw new Error(`Failed to upload attachment to Taiga: ${error.message}`);
+    }
+  }
+
+  /**
+   * Upload attachment from file path (legacy method for backward compatibility)
+   * @param {string} itemType - Type of item ('issue', 'user_story', 'task')
+   * @param {number} itemId - ID of the item
+   * @param {string} filePath - Path to the file to upload
+   * @param {string} [description] - Optional description for the attachment
+   * @returns {Promise<Object>} - Created attachment
+   */
+  async uploadAttachmentFromPath(itemType, itemId, filePath, description) {
+    try {
+      
+      // Import required modules
+      const fs = await import('fs');
+      const path = await import('path');
       
       // Validate filePath parameter
       if (!filePath || typeof filePath !== 'string') {
@@ -638,7 +726,8 @@ export class TaigaService {
         fileExists = fs.default.existsSync(absolutePath);
       } else {
         // For relative paths, try different resolution strategies
-        const homeDir = process.env.HOME || process.env.USERPROFILE || require('os').homedir();
+        const os = await import('os');
+        const homeDir = process.env.HOME || process.env.USERPROFILE || os.default.homedir();
         const possiblePaths = [
           // 1. Relative to current working directory
           path.default.resolve(process.cwd(), filePath),
@@ -660,7 +749,8 @@ export class TaigaService {
       }
       
       if (!fileExists) {
-        const homeDir = process.env.HOME || process.env.USERPROFILE || require('os').homedir();
+        const os = await import('os');
+        const homeDir = process.env.HOME || process.env.USERPROFILE || os.default.homedir();
         const searchedPaths = path.default.isAbsolute(filePath) 
           ? [filePath]
           : [
@@ -672,51 +762,45 @@ export class TaigaService {
         throw new Error(`File not found. Searched paths:\n${searchedPaths.join('\n')}`);
       }
       
-      // Read file stats and create form data
-      const fileStats = fs.default.statSync(absolutePath);
+      // Convert file to base64 and use the new method
+      const fileBuffer = fs.default.readFileSync(absolutePath);
+      const fileData = fileBuffer.toString('base64');
       const fileName = path.default.basename(absolutePath);
-      const fileStream = fs.default.createReadStream(absolutePath);
       
-      // Create FormData instance
-      const formData = new FormData();
-      formData.append('object_id', itemId.toString());
-      formData.append('attached_file', fileStream, fileName);
-      if (description) {
-        formData.append('description', description);
-      }
+      // Detect MIME type
+      const mimeType = this.detectMimeType(fileName);
       
-      // Use axios with FormData
-      const response = await client.post(endpoint, formData, {
-        headers: {
-          ...formData.getHeaders(),
-          'Authorization': `Bearer ${token}`
-        },
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-      });
-      
-      return response.data;
+      // Use the new base64 upload method
+      return await this.uploadAttachment(itemType, itemId, fileData, fileName, mimeType, description);
       
     } catch (error) {
-      
-      // Provide more specific error information
-      if (error.message.includes('ENOENT')) {
-        throw new Error(`File not found: ${filePath}`);
-      } else if (error.message.includes('EACCES')) {
-        throw new Error(`Permission denied accessing file: ${filePath}`);
-      } else if (error.message.includes('cb is not a function')) {
-        console.error('Callback error detected - this might be a form-data compatibility issue');
-        throw new Error('Upload failed due to form-data callback issue - please check file permissions and format');
-      } else if (error.response?.status === 413) {
-        throw new Error('File too large for upload');
-      } else if (error.response?.status === 401) {
-        throw new Error('Authentication failed - please check credentials');
-      } else if (error.response?.status === 404) {
-        throw new Error('Upload endpoint not found - check item ID and type');
-      }
-      
-      throw new Error(`Failed to upload attachment to Taiga: ${error.message}`);
+      throw new Error(`Failed to upload attachment from path: ${error.message}`);
     }
+  }
+
+  /**
+   * Detect MIME type from file extension
+   * @param {string} fileName - File name
+   * @returns {string} - MIME type
+   */
+  detectMimeType(fileName) {
+    const ext = fileName.toLowerCase().split('.').pop();
+    const mimeTypes = {
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'pdf': 'application/pdf',
+      'txt': 'text/plain',
+      'doc': 'application/msword',
+      'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'xls': 'application/vnd.ms-excel',
+      'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'zip': 'application/zip',
+      'mp4': 'video/mp4',
+      'mp3': 'audio/mpeg'
+    };
+    return mimeTypes[ext] || 'application/octet-stream';
   }
 
   /**
@@ -801,6 +885,17 @@ export class TaigaService {
       console.error('Failed to delete attachment:', error.message);
       throw new Error('Failed to delete attachment from Taiga');
     }
+  }
+
+  /**
+   * Get item data (to extract project info)
+   * @private
+   */
+  async getItemData(itemType, itemId) {
+    const client = await createAuthenticatedClient();
+    const endpoint = this.getItemEndpoint(itemType);
+    const response = await client.get(`${endpoint}/${itemId}`);
+    return response.data;
   }
 
   /**

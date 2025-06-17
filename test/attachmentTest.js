@@ -76,25 +76,25 @@ async function runAttachmentTests() {
     // Check uploadAttachmentTool structure
     assert(uploadAttachmentTool.name === 'uploadAttachment', 'uploadAttachmentTool has correct name');
     assert(typeof uploadAttachmentTool.description === 'string', 'uploadAttachmentTool has description');
-    assert(typeof uploadAttachmentTool.inputSchema === 'object', 'uploadAttachmentTool has inputSchema');
+    assert(typeof uploadAttachmentTool.schema === 'object', 'uploadAttachmentTool has schema');
     assert(typeof uploadAttachmentTool.handler === 'function', 'uploadAttachmentTool has handler function');
     
     // Check listAttachmentsTool structure
     assert(listAttachmentsTool.name === 'listAttachments', 'listAttachmentsTool has correct name');
     assert(typeof listAttachmentsTool.description === 'string', 'listAttachmentsTool has description');
-    assert(typeof listAttachmentsTool.inputSchema === 'object', 'listAttachmentsTool has inputSchema');
+    assert(typeof listAttachmentsTool.schema === 'object', 'listAttachmentsTool has schema');
     assert(typeof listAttachmentsTool.handler === 'function', 'listAttachmentsTool has handler function');
     
     // Check downloadAttachmentTool structure
     assert(downloadAttachmentTool.name === 'downloadAttachment', 'downloadAttachmentTool has correct name');
     assert(typeof downloadAttachmentTool.description === 'string', 'downloadAttachmentTool has description');
-    assert(typeof downloadAttachmentTool.inputSchema === 'object', 'downloadAttachmentTool has inputSchema');
+    assert(typeof downloadAttachmentTool.schema === 'object', 'downloadAttachmentTool has schema');
     assert(typeof downloadAttachmentTool.handler === 'function', 'downloadAttachmentTool has handler function');
     
     // Check deleteAttachmentTool structure
     assert(deleteAttachmentTool.name === 'deleteAttachment', 'deleteAttachmentTool has correct name');
     assert(typeof deleteAttachmentTool.description === 'string', 'deleteAttachmentTool has description');
-    assert(typeof deleteAttachmentTool.inputSchema === 'object', 'deleteAttachmentTool has inputSchema');
+    assert(typeof deleteAttachmentTool.schema === 'object', 'deleteAttachmentTool has schema');
     assert(typeof deleteAttachmentTool.handler === 'function', 'deleteAttachmentTool has handler function');
   });
 
@@ -105,7 +105,10 @@ async function runAttachmentTests() {
     
     // Test uploadAttachment schema
     try {
-      const uploadResult = uploadAttachmentTool.inputSchema.parse({
+      // Create zod schema from the tool schema
+      const { z } = await import('zod');
+      const uploadSchema = z.object(uploadAttachmentTool.schema);
+      const uploadResult = uploadSchema.parse({
         itemType: 'issue',
         itemId: 123,
         filePath: '/path/to/file.txt',
@@ -121,7 +124,9 @@ async function runAttachmentTests() {
     
     // Test listAttachments schema
     try {
-      const listResult = listAttachmentsTool.inputSchema.parse({
+      const { z } = await import('zod');
+      const listSchema = z.object(listAttachmentsTool.schema);
+      const listResult = listSchema.parse({
         itemType: 'user_story',
         itemId: 456
       });
@@ -133,7 +138,9 @@ async function runAttachmentTests() {
     
     // Test downloadAttachment schema
     try {
-      const downloadResult = downloadAttachmentTool.inputSchema.parse({
+      const { z } = await import('zod');
+      const downloadSchema = z.object(downloadAttachmentTool.schema);
+      const downloadResult = downloadSchema.parse({
         attachmentId: 789,
         downloadPath: '/download/path'
       });
@@ -145,7 +152,9 @@ async function runAttachmentTests() {
     
     // Test deleteAttachment schema
     try {
-      const deleteResult = deleteAttachmentTool.inputSchema.parse({
+      const { z } = await import('zod');
+      const deleteSchema = z.object(deleteAttachmentTool.schema);
+      const deleteResult = deleteSchema.parse({
         attachmentId: 999
       });
       assert(deleteResult.attachmentId === 999, 'deleteAttachment schema validates attachmentId');
@@ -156,12 +165,14 @@ async function runAttachmentTests() {
 
   // Test 4: Test schema validation errors
   await test('Test attachment schema validation errors', async () => {
-    const { uploadAttachmentTool, listAttachmentsTool, downloadAttachmentTool, deleteAttachmentTool } = 
+    const { uploadAttachmentTool, downloadAttachmentTool } = 
       await import('../src/tools/attachmentTools.js');
+    const { z } = await import('zod');
     
     // Test invalid itemType for upload
     try {
-      uploadAttachmentTool.inputSchema.parse({
+      const uploadSchema = z.object(uploadAttachmentTool.schema);
+      uploadSchema.parse({
         itemType: 'invalid_type',
         itemId: 123,
         filePath: '/path/to/file.txt'
@@ -173,7 +184,8 @@ async function runAttachmentTests() {
     
     // Test missing filePath for upload
     try {
-      uploadAttachmentTool.inputSchema.parse({
+      const uploadSchema = z.object(uploadAttachmentTool.schema);
+      uploadSchema.parse({
         itemType: 'task',
         itemId: 123
       });
@@ -184,7 +196,8 @@ async function runAttachmentTests() {
     
     // Test invalid attachmentId type for download
     try {
-      downloadAttachmentTool.inputSchema.parse({
+      const downloadSchema = z.object(downloadAttachmentTool.schema);
+      downloadSchema.parse({
         attachmentId: 'not_a_number'
       });
       assert(false, 'Should reject non-number attachmentId');

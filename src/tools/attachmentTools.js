@@ -16,16 +16,21 @@ const taigaService = new TaigaService();
  */
 export const uploadAttachmentTool = {
   name: 'uploadAttachment',
-  description: 'Upload a file attachment to an Issue, User Story, or Task',
+  description: 'Upload a file attachment to an Issue, User Story, or Task. Provide either filePath (recommended) or fileData+fileName.',
   schema: {
     itemType: z.enum(['issue', 'user_story', 'task']).describe('Type of item to attach file to'),
     itemId: z.union([z.number(), z.string()]).transform(val => typeof val === 'string' ? parseInt(val) : val).describe('ID of the item to attach file to'),
     projectIdentifier: z.string().optional().describe('Project ID or slug (required for issues)'),
-    filePath: z.string().min(1).describe('File path is required'),
+    // 主要方式：文件路徑 (Claude Client 支援)
+    filePath: z.string().optional().describe('File path - supports absolute paths, relative paths, or just filename (will search common locations)'),
+    // 進階方式：直接 Base64 數據 (程式化使用)
+    fileData: z.string().optional().describe('Base64 encoded file data (for programmatic use)'),
+    fileName: z.string().optional().describe('Original file name (required with fileData)'),
+    mimeType: z.string().optional().describe('MIME type of the file (auto-detected if not provided)'),
     description: z.string().optional().describe('Optional description for the attachment')
   },
   
-  handler: async ({ itemType, itemId, projectIdentifier, filePath, description }) => {
+  handler: async ({ itemType, itemId, projectIdentifier, fileData, fileName, mimeType, filePath, description }) => {
     try {
       if (!taigaService.isAuthenticated()) {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
@@ -57,16 +62,26 @@ export const uploadAttachmentTool = {
         }
       }
 
-      const result = await taigaService.uploadAttachment(itemType, actualItemId, filePath, description);
+      // 智能檢測使用哪種上傳模式
+      let uploadResult;
+      if (filePath) {
+        // 主要方式：使用文件路徑 (Claude Client 支援)
+        uploadResult = await taigaService.uploadAttachmentFromPath(itemType, actualItemId, filePath, description);
+      } else if (fileData && fileName) {
+        // 進階方式：使用 Base64 數據 (程式化使用)
+        uploadResult = await taigaService.uploadAttachment(itemType, actualItemId, fileData, fileName, mimeType, description);
+      } else {
+        throw new Error('Please provide either filePath (recommended for Claude Client) or fileData+fileName (for programmatic use)');
+      }
       
       return createSuccessResponse(
         `${SUCCESS_MESSAGES.ATTACHMENT_UPLOADED}\n\n` +
         `**附件信息**\n` +
-        `- 文件名: ${result.name}\n` +
-        `- 大小: ${(result.size / 1024).toFixed(2)} KB\n` +
+        `- 文件名: ${uploadResult.name}\n` +
+        `- 大小: ${(uploadResult.size / 1024).toFixed(2)} KB\n` +
         `- 附件到: ${itemType} #${itemId}\n` +
-        `- 上傳時間: ${new Date(result.created_date).toLocaleString()}\n` +
-        `${result.description ? `- 描述: ${result.description}\n` : ''}`
+        `- 上傳時間: ${new Date(uploadResult.created_date).toLocaleString()}\n` +
+        `${uploadResult.description ? `- 描述: ${uploadResult.description}\n` : ''}`
       );
     } catch (error) {
       console.error('Error uploading attachment:', error);
