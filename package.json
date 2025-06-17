@@ -1,6 +1,6 @@
 {
   "name": "taiga-mcp-server",
-  "version": "1.9.11",
+  "version": "1.9.12",
   "main": "src/index.js",
   "type": "module",
   "bin": {
