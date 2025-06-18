@@ -49,7 +49,7 @@ export const listIssuesTool = {
 export const updateIssueStatusTool = {
   name: 'updateIssueStatus',
   schema: {
-    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123" or "#45")'),
+    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123", "#45", or "45" - auto-detects format)'),
     status: z.string().describe('Name of the target status (e.g., "In Progress", "Done")'),
     projectIdentifier: z.string().optional().describe('Project ID or slug (required if using reference number)'),
   },
@@ -92,7 +92,7 @@ Issue Details:
 export const getIssueTool = {
   name: 'getIssue',
   schema: {
-    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123" or "#45")'),
+    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123", "#45", or "45" - auto-detects format)'),
     projectIdentifier: z.string().optional().describe('Project ID or slug (required if using reference number)'),
   },
   handler: async ({ issueIdentifier, projectIdentifier }) => {
@@ -212,7 +212,7 @@ Project: ${getSafeValue(createdIssue.project_extra_info?.name)}`;
 export const addIssueToSprintTool = {
   name: 'addIssueToSprint',
   schema: {
-    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123" or "#45")'),
+    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123", "#45", or "45" - auto-detects format)'),
     sprintIdentifier: z.string().describe('Sprint ID or name (or "remove" to remove from sprint)'),
     projectIdentifier: z.string().optional().describe('Project ID or slug (required if using reference number)'),
   },
@@ -298,7 +298,7 @@ Status: ${getSafeValue(updatedIssue.status_extra_info?.name)}`;
 export const assignIssueTool = {
   name: 'assignIssue',
   schema: {
-    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123" or "#45")'),
+    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123", "#45", or "45" - auto-detects format)'),
     assignee: z.string().describe('Username or user ID to assign the issue to (or "unassign" to remove assignment)'),
     projectIdentifier: z.string().optional().describe('Project ID or slug (required if using reference number)'),
   },

@@ -212,6 +212,18 @@ For self-hosted Taiga instances:
 🗣️ "Show me issue #123 details"
 🔍 Returns: Complete issue info including sprint, assignee, timeline
 
+🗣️ "Update issue 838 status to 'In Progress'"
+🔄 Returns: Issue status updated with confirmation
+
+🗣️ "Assign issue 838 to John Doe"
+👤 Returns: Issue assigned to team member with details
+
+🗣️ "Add issue 838 to Sprint 1.0.95"
+🏃 Returns: Issue moved to sprint with confirmation
+
+🗣️ "Remove issue 838 from sprint"
+🏃 Returns: Issue removed from sprint assignment
+
 🗣️ "What issues are in Sprint 3?"
 📋 Returns: All issues assigned to that sprint
 ```
@@ -354,7 +366,7 @@ The system supports two upload methods optimized for different use cases:
 🗑️ Returns: Wiki page permanently deleted with confirmation details
 ```
 
-## 🔧 Available Tools (39 Total)
+## 🔧 Available Tools (42 Total)
 
 ### 🔐 Authentication (1 tool)
 | Tool | Description |
@@ -375,12 +387,15 @@ The system supports two upload methods optimized for different use cases:
 | `createMilestone` | Create new sprints with dates |
 | `getIssuesByMilestone` | View all issues in a sprint |
 
-### 🐛 Issue Management (3 tools)
+### 🐛 Issue Management (6 tools)
 | Tool | Description |
 |------|-------------|
 | `listIssues` | List issues with sprint info |
 | `getIssue` | Get detailed issue information |
 | `createIssue` | Create issues with priorities/types |
+| `updateIssueStatus` | Update issue status (e.g., "In Progress", "Done") |
+| `addIssueToSprint` | Assign issues to sprints or remove from sprints |
+| `assignIssue` | Assign issues to team members or unassign |
 
 ### 📝 User Story Management (2 tools)
 | Tool | Description |

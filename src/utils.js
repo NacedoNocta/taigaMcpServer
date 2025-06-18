@@ -28,6 +28,7 @@ export async function resolveProjectId(projectIdentifier) {
  * @returns {Promise<Object>} - Issue object
  */
 export async function resolveIssue(issueIdentifier, projectIdentifier) {
+  // Handle #-prefixed reference numbers
   if (issueIdentifier.startsWith('#')) {
     if (!projectIdentifier) {
       throw new Error('Project identifier is required when using issue reference number');
@@ -38,6 +39,29 @@ export async function resolveIssue(issueIdentifier, projectIdentifier) {
     return await taigaService.getIssueByRef(ref, projectId);
   }
   
+  // For pure numbers, try both approaches: first as ID, then as reference number
+  if (/^\d+$/.test(issueIdentifier)) {
+    // First try as direct Issue ID
+    try {
+      return await taigaService.getIssue(issueIdentifier);
+    } catch (error) {
+      // If that fails and we have a project identifier, try as reference number
+      if (projectIdentifier) {
+        try {
+          const projectId = await resolveProjectId(projectIdentifier);
+          return await taigaService.getIssueByRef(issueIdentifier, projectId);
+        } catch (refError) {
+          // If both fail, throw a more helpful error
+          throw new Error(`Issue not found by ID "${issueIdentifier}" or reference number "#${issueIdentifier}" in project. Original errors: ID lookup: ${error.message}, Ref lookup: ${refError.message}`);
+        }
+      } else {
+        // No project identifier available, can only try ID
+        throw new Error(`Issue ID "${issueIdentifier}" not found. If this is a reference number, please provide projectIdentifier or use "#${issueIdentifier}" format.`);
+      }
+    }
+  }
+  
+  // For non-numeric strings, treat as direct ID
   return await taigaService.getIssue(issueIdentifier);
 }
 
