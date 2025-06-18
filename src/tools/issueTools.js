@@ -44,6 +44,49 @@ export const listIssuesTool = {
 };
 
 /**
+ * Tool to update the status of an issue
+ */
+export const updateIssueStatusTool = {
+  name: 'updateIssueStatus',
+  schema: {
+    issueIdentifier: z.string().describe('Issue ID or reference number (e.g., "123" or "#45")'),
+    status: z.string().describe('Name of the target status (e.g., "In Progress", "Done")'),
+    projectIdentifier: z.string().optional().describe('Project ID or slug (required if using reference number)'),
+  },
+  handler: async ({ issueIdentifier, status, projectIdentifier }) => {
+    try {
+      const issue = await resolveIssue(issueIdentifier, projectIdentifier);
+      const projectId = issue.project; // Get project ID from the resolved issue
+
+      const statuses = await taigaService.getIssueStatuses(projectId);
+      const statusId = findIdByName(statuses, status);
+
+      if (!statusId) {
+        const availableStatuses = statuses.map(s => `- ${s.name} (ID: ${s.id})`).join('\n');
+        return createErrorResponse(
+          `Invalid status name: "${status}". Available statuses for project "${issue.project_extra_info?.name}":\n${availableStatuses}`
+        );
+      }
+
+      const updatedIssue = await taigaService.updateIssue(issue.id, { status: statusId });
+
+      const successMessage = `Successfully updated status for issue #${updatedIssue.ref} to "${updatedIssue.status_extra_info?.name}".
+
+Issue Details:
+- Subject: ${updatedIssue.subject}
+- Project: ${getSafeValue(updatedIssue.project_extra_info?.name)}
+- New Status: ${getSafeValue(updatedIssue.status_extra_info?.name)}
+- Assigned to: ${getSafeValue(updatedIssue.assigned_to_extra_info?.full_name, STATUS_LABELS.UNASSIGNED)}
+- Sprint: ${getSafeValue(updatedIssue.milestone_extra_info?.name, STATUS_LABELS.NO_SPRINT)}`;
+
+      return createSuccessResponse(successMessage);
+    } catch (error) {
+      return createErrorResponse(`Failed to update issue status: ${error.message}`);
+    }
+  }
+};
+
+/**
  * Tool to get single issue details
  */
 export const getIssueTool = {
