@@ -1,106 +1,106 @@
 # CLAUDE.md
 
-This file provides comprehensive guidance to Claude Code (claude.ai/code) when working with the Taiga MCP Server codebase.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🚀 项目概述
+## 🚀 Project Overview
 
-**Taiga MCP Server** 是一个高度模块化的Model Context Protocol服务器，提供与Taiga项目管理系统的完整自然语言接口。项目采用现代Node.js ES模块架构，通过stdio传输与MCP客户端通信，支持企业级项目管理功能。
+**Taiga MCP Server** is a highly modular Model Context Protocol server that provides a complete natural language interface for Taiga project management systems. The project uses modern Node.js ES module architecture, communicating with MCP clients via stdio transport, supporting enterprise-level project management features.
 
-### 核心特性
-- **完整的Sprint管理** - 创建、追踪、统计分析
-- **问题生命周期管理** - Issue与Sprint关联追踪
-- **批次操作支援** - 批量创建Issues、Stories、Tasks (最多20个)
-- **高级查询语法** - 类SQL语法精确搜索和过滤数据
-- **评论协作系统** - 完整的团队讨论和协作功能
-- **文件附件管理** - 上传、下载、管理项目文件资源
-- **Epic项目管理** - 大型项目史诗级功能组织和管理
-- **Wiki知识管理** - 完整的项目文档和知识库系统
-- **模块化架构** - 39个MCP工具，12个功能分类
-- **专业测试框架** - 单元测试、集成测试、MCP协议测试、专项功能测试
-- **AI协作开发** - 展示人机协作软件开发潜力
+### Core Features
+- **Complete Sprint Management** - Create, track, and analyze statistics
+- **Issue Lifecycle Management** - Issue and Sprint association tracking  
+- **Batch Operations Support** - Bulk creation of Issues, Stories, Tasks (up to 20 items)
+- **Advanced Query Syntax** - SQL-like syntax for precise data search and filtering
+- **Comment Collaboration System** - Complete team discussion and collaboration features
+- **File Attachment Management** - Upload, download, and manage project file resources
+- **Epic Project Management** - Large-scale project epic-level feature organization and management
+- **Wiki Knowledge Management** - Complete project documentation and knowledge base system
+- **Modular Architecture** - 42 MCP tools across 12 functional categories
+- **Professional Testing Framework** - Unit tests, integration tests, MCP protocol tests, specialized feature tests
+- **AI-Assisted Development** - Demonstrates human-AI collaborative software development potential
 
-## 📋 常用命令
+## 📋 Common Commands
 
-### 开发和运行
+### Development and Running
 ```bash
-npm start                    # 启动MCP服务器（stdio模式）
-npm test                     # 运行默认测试套件（单元+快速测试）
-npm run test:unit           # 运行单元测试（无外部依赖）
-npm run test:quick          # 运行快速功能测试
-npm run test:basic          # 运行MCP协议测试（复杂）
-npm run test:integration    # 运行Taiga API集成测试（需凭据）
-npm run test:full          # 运行所有测试套件
-node test/batchTest.js     # 运行批次操作专项测试
-node test/advancedQueryTest.js  # 运行高级查询专项测试
-node test/commentTest.js      # 运行评论系统专项测试
-node test/attachmentTest.js   # 运行文件附件专项测试
-node test/base64UploadTest.js # 运行Base64文件上传专项测试 (新增)
-node test/epicTest.js         # 运行Epic管理专项测试
+npm start                    # Start MCP server (stdio mode)
+npm test                     # Run default test suite (unit + quick tests)
+npm run test:unit           # Run unit tests (no external dependencies)
+npm run test:quick          # Run quick functional tests
+npm run test:basic          # Run MCP protocol tests (complex)
+npm run test:integration    # Run Taiga API integration tests (requires credentials)
+npm run test:full          # Run all test suites
+node test/batchTest.js     # Run batch operations specialized tests
+node test/advancedQueryTest.js  # Run advanced query specialized tests
+node test/commentTest.js      # Run comment system specialized tests
+node test/attachmentTest.js   # Run file attachment specialized tests
+node test/base64UploadTest.js # Run Base64 file upload specialized tests (new)
+node test/epicTest.js         # Run Epic management specialized tests
 ```
 
-### 包管理与发布
+### Package Management and Publishing
 ```bash
-# 手动发布（不推荐）
-npm publish                 # 发布到npm（需要版本更新）
+# Manual publishing (not recommended)
+npm publish                 # Publish to npm (requires version update)
 
-# 自动化发布（推荐）
-npm version patch           # 创建新版本并触发自动发布
-git push origin main --tags # 推送标签，触发CI/CD自动发布
+# Automated publishing (recommended)
+npm version patch           # Create new version and trigger auto-publish
+git push origin main --tags # Push tags to trigger CI/CD auto-publish
 
-# 使用已发布的包
+# Using published packages
 npx taiga-mcp-server                     # NPM Registry
 npx @greddy7574/taiga-mcp-server        # GitHub Package Registry
 ```
 
-### Docker 部署
+### Docker Deployment
 ```bash
-# 构建镜像
+# Build image
 docker build -t taiga-mcp-server .
 
-# 运行容器（需要 .env 文件）
+# Run container (requires .env file)
 docker run --rm -i --env-file .env taiga-mcp-server
 
-# 使用 docker-compose
-docker-compose up --build        # 生产环境
-docker-compose --profile dev up  # 开发环境（包含测试）
+# Using docker-compose
+docker-compose up --build        # Production environment
+docker-compose --profile dev up  # Development environment (includes tests)
 
-# 清理
+# Cleanup
 docker-compose down
 docker system prune -f
 ```
 
-### Wiki 文档同步
+### Wiki Documentation Sync
 ```bash
-# Wiki 推送流程（docs 文件夹直接关联到 Wiki 仓库）
-cd docs                      # 进入 docs 文件夹
-git status                   # 检查修改状态
-git add .                    # 添加所有修改文件
-git commit -m "📚 更新Wiki文档"  # 创建提交
-git push origin master       # 推送到 GitHub Wiki
+# Wiki push workflow (docs folder directly linked to Wiki repository)
+cd docs                      # Enter docs folder
+git status                   # Check modification status
+git add .                    # Add all modified files
+git commit -m "📚 Update Wiki documentation"  # Create commit
+git push origin master       # Push to GitHub Wiki
 
-# Wiki 链接格式规范
-# 正确: [[显示文本|页面名称]]
-# 错误: [[页面名称|显示文本]]
+# Wiki link format specification
+# Correct: [[Display Text|Page Name]]
+# Incorrect: [[Page Name|Display Text]]
 
-# 重要提醒:
-# - docs 文件夹已配置为 Wiki 仓库 (*.wiki.git)
-# - 主项目在 main 分支，Wiki 在 master 分支
-# - 修改 docs 内容后需要手动推送到 Wiki
-# - Wiki 链接格式必须为 [[显示文本|页面名称]]
+# Important reminders:
+# - docs folder is configured as Wiki repository (*.wiki.git)
+# - Main project on main branch, Wiki on master branch
+# - After modifying docs content, must manually push to Wiki
+# - Wiki link format must be [[Display Text|Page Name]]
 ```
 
-## ⚙️ 环境配置
+## ⚙️ Environment Configuration
 
-### 必需的.env文件
+### Required .env File
 ```env
 TAIGA_API_URL=https://api.taiga.io/api/v1
 TAIGA_USERNAME=your_username  
 TAIGA_PASSWORD=your_password
 ```
 
-### Claude Desktop配置
+### Claude Desktop Configuration
 
-#### NPM方式（推荐）
+#### NPM Method (Recommended)
 ```json
 {
   "mcpServers": {
@@ -117,7 +117,7 @@ TAIGA_PASSWORD=your_password
 }
 ```
 
-#### Docker方式
+#### Docker Method
 ```json
 {
   "mcpServers": {
@@ -137,7 +137,7 @@ TAIGA_PASSWORD=your_password
 }
 ```
 
-#### Docker Compose方式
+#### Docker Compose Method
 ```json
 {
   "mcpServers": {
@@ -153,240 +153,251 @@ TAIGA_PASSWORD=your_password
 }
 ```
 
-## 🏗️ 架构结构
+## 🏗️ Architecture Structure
 
-### 模块化设计 (v1.5.0+)
+### Modular Design (v1.5.0+)
 ```
 src/
-├── index.js              # MCP服务器主入口（130行）
-├── constants.js          # 统一常量管理（76行）
-├── utils.js             # 工具函数库（120行）
-├── taigaAuth.js         # 认证管理
-├── taigaService.js      # API服务层（420行）
-└── tools/               # MCP工具模块
-    ├── index.js         # 工具注册中心
-    ├── authTools.js     # 认证工具
-    ├── projectTools.js  # 项目管理工具
-    ├── sprintTools.js   # Sprint管理工具
-    ├── issueTools.js    # 问题管理工具
-    ├── userStoryTools.js # 用户故事工具
-    ├── taskTools.js     # 任务管理工具
-    ├── batchTools.js    # 批次操作工具
-    ├── advancedSearchTools.js # 高级搜索工具
-    ├── commentTools.js  # 评论系统工具
-    ├── attachmentTools.js # 文件附件工具
-    └── epicTools.js     # Epic管理工具
+├── index.js              # Main MCP server entry point (130 lines)
+├── constants.js          # Unified constant management (76 lines)
+├── utils.js             # Utility function library (120 lines)
+├── taigaAuth.js         # Authentication management
+├── taigaService.js      # API service layer (420 lines)
+├── query/               # Advanced query system
+│   ├── QueryParser.js   # SQL-like query syntax parser
+│   ├── QueryExecutor.js # Query execution engine
+│   └── queryGrammar.js  # Query syntax definitions
+└── tools/               # MCP tool modules
+    ├── index.js         # Tool registry center
+    ├── authTools.js     # Authentication tools
+    ├── projectTools.js  # Project management tools
+    ├── sprintTools.js   # Sprint management tools
+    ├── issueTools.js    # Issue management tools
+    ├── userStoryTools.js # User story tools
+    ├── taskTools.js     # Task management tools
+    ├── batchTools.js    # Batch operation tools
+    ├── advancedSearchTools.js # Advanced search tools
+    ├── commentTools.js  # Comment system tools
+    ├── attachmentTools.js # File attachment tools
+    ├── epicTools.js     # Epic management tools
+    └── wikiTools.js     # Wiki management tools
 ```
 
-### MCP工具分类（39个工具）
+### MCP Tool Categories (42 tools)
 
-#### 🔐 认证工具 (1个)
-- `authenticate` - Taiga用户认证
+#### 🔐 Authentication Tools (1 tool)
+- `authenticate` - Taiga user authentication
 
-#### 📁 项目管理 (2个)
-- `listProjects` - 列出用户项目
-- `getProject` - 获取项目详情（支持ID和slug）
+#### 📁 Project Management (2 tools)
+- `listProjects` - List user projects
+- `getProject` - Get project details (supports ID and slug)
 
-#### 🏃 Sprint管理 (4个)
-- `listMilestones` - 列出项目Sprint（里程碑）
-- `getMilestoneStats` - Sprint统计信息（进度、完成率）
-- `createMilestone` - 创建新Sprint
-- `getIssuesByMilestone` - 获取Sprint中的所有问题
+#### 🏃 Sprint Management (4 tools)
+- `listMilestones` - List project Sprints (milestones)
+- `getMilestoneStats` - Sprint statistics (progress, completion rate)
+- `createMilestone` - Create new Sprint
+- `getIssuesByMilestone` - Get all issues in a Sprint
 
-#### 🐛 问题管理 (3个)
-- `listIssues` - 列出项目问题（含Sprint信息）
-- `getIssue` - 问题详情（包括Sprint分配）
-- `createIssue` - 创建问题（支持状态、优先级等）
+#### 🐛 Issue Management (6 tools)
+- `listIssues` - List project issues (with Sprint information)
+- `getIssue` - Issue details (including Sprint assignment)
+- `createIssue` - Create issues (supports status, priority, etc.)
+- `updateIssueStatus` - Update issue status
+- `addIssueToSprint` - Add/remove issues to/from sprints
+- `assignIssue` - Assign/unassign issues to team members
 
-#### 📝 用户故事管理 (2个)
-- `listUserStories` - 列出项目用户故事
-- `createUserStory` - 创建用户故事
+#### 📝 User Story Management (2 tools)
+- `listUserStories` - List project user stories
+- `createUserStory` - Create user stories
 
-#### ✅ 任务管理 (1个)
-- `createTask` - 创建任务（关联用户故事）
+#### ✅ Task Management (1 tool)
+- `createTask` - Create tasks (linked to user stories)
 
-#### 🚀 批次操作 (3个)
-- `batchCreateIssues` - 批量创建Issues（最多20个）
-- `batchCreateUserStories` - 批量创建用户故事
-- `batchCreateTasks` - 批量创建任务（关联特定Story）
+#### 🚀 Batch Operations (3 tools)
+- `batchCreateIssues` - Bulk create Issues (up to 20 items)
+- `batchCreateUserStories` - Bulk create user stories
+- `batchCreateTasks` - Bulk create tasks (linked to specific Story)
 
-#### 🔍 高级搜索 (3个) - **新功能**
-- `advancedSearch` - 高级查询语法搜索（类SQL语法）
-- `queryHelp` - 查询语法帮助和示例
-- `validateQuery` - 查询语法验证工具
+#### 🔍 Advanced Search (3 tools) - **New Feature**
+- `advancedSearch` - Advanced query syntax search (SQL-like syntax)
+- `queryHelp` - Query syntax help and examples
+- `validateQuery` - Query syntax validation tool
 
-#### 💬 评论系统 (4个) - **协作增强**
-- `addComment` - 为Issues/Stories/Tasks添加评论
-- `listComments` - 查看项目完整评论历史
-- `editComment` - 编辑已发布的评论内容
-- `deleteComment` - 删除不需要的评论
+#### 💬 Comment System (4 tools) - **Collaboration Enhancement**
+- `addComment` - Add comments to Issues/Stories/Tasks
+- `listComments` - View complete project comment history
+- `editComment` - Edit published comment content
+- `deleteComment` - Delete unwanted comments
 
-#### 📎 文件附件 (4个) - **资源管理 (基于Base64)**
-- `uploadAttachment` - 上传文件附件到Issues/Stories/Tasks (Base64编码)
-- `listAttachments` - 查看项目工作项的所有附件
-- `downloadAttachment` - 下载指定的文件附件
-- `deleteAttachment` - 删除不需要的文件附件
+#### 📎 File Attachments (4 tools) - **Resource Management (Base64-based)**
+- `uploadAttachment` - Upload file attachments to Issues/Stories/Tasks (Base64 encoded)
+- `listAttachments` - View all attachments for project work items
+- `downloadAttachment` - Download specified file attachments
+- `deleteAttachment` - Delete unwanted file attachments
 
-**重要更新 (v1.9.8+)**: 文件上传已改为Base64编码模式，解决了MCP协议的文件路径限制问题。参见 `FILE_UPLOAD_GUIDE.md` 了解迁移指南。
+**Important Update (v1.9.8+)**: File upload has been changed to Base64 encoding mode, solving MCP protocol file path limitation issues. See `FILE_UPLOAD_GUIDE.md` for migration guide.
 
-#### 🏛️ Epic管理 (6个) - **企业级项目组织**
-- `createEpic` - 创建大型项目史诗级功能
-- `listEpics` - 列出项目中的所有Epic
-- `getEpic` - 获取Epic详细信息和进度统计
-- `updateEpic` - 更新Epic信息和状态
-- `linkStoryToEpic` - 将用户故事关联到Epic
-- `unlinkStoryFromEpic` - 从Epic中移除用户故事关联
+#### 🏛️ Epic Management (6 tools) - **Enterprise-level Project Organization**
+- `createEpic` - Create large-scale project epic-level features
+- `listEpics` - List all Epics in a project
+- `getEpic` - Get Epic detailed information and progress statistics
+- `updateEpic` - Update Epic information and status
+- `linkStoryToEpic` - Link user stories to Epics
+- `unlinkStoryFromEpic` - Remove user story associations from Epics
 
-#### 📖 Wiki管理 (6个) - **知识库和文档中心**
-- `createWikiPage` - 创建项目Wiki页面，支持Markdown
-- `listWikiPages` - 列出项目中的所有Wiki页面
-- `getWikiPage` - 通过ID或slug获取Wiki页面详情
-- `updateWikiPage` - 更新Wiki页面内容和设置
-- `deleteWikiPage` - 删除Wiki页面（不可逆操作）
-- `watchWikiPage` - 关注/取消关注Wiki页面变更通知
+#### 📖 Wiki Management (6 tools) - **Knowledge Base and Documentation Center**
+- `createWikiPage` - Create project Wiki pages with Markdown support
+- `listWikiPages` - List all Wiki pages in a project
+- `getWikiPage` - Get Wiki page details by ID or slug
+- `updateWikiPage` - Update Wiki page content and settings
+- `deleteWikiPage` - Delete Wiki pages (irreversible operation)
+- `watchWikiPage` - Watch/unwatch Wiki page change notifications
 
-### 测试架构
+### Testing Architecture
 ```
 test/
-├── README.md           # 测试文档
-├── unitTest.js        # 单元测试（11个测试，100%通过）
-├── quickTest.js       # 快速功能测试（4个测试）
-├── mcpTest.js         # MCP协议测试（8个测试，复杂）
-├── integration.js     # Taiga API集成测试（需凭据）
-├── batchTest.js       # 批次操作测试（9个测试，100%通过）
-├── advancedQueryTest.js # 高级查询测试（11个测试，100%通过）
-├── commentTest.js     # 评论系统测试（10个测试，100%通过）
-├── attachmentTest.js  # 文件附件测试（10个测试，100%通过）
-├── epicTest.js        # Epic管理测试（10个测试，100%通过）
-└── runTests.js        # 综合测试运行器
+├── README.md           # Testing documentation
+├── unitTest.js        # Unit tests (11 tests, 100% pass)
+├── quickTest.js       # Quick functional tests (4 tests)
+├── mcpTest.js         # MCP protocol tests (8 tests, complex)
+├── integration.js     # Taiga API integration tests (requires credentials)
+├── batchTest.js       # Batch operations tests (9 tests, 100% pass)
+├── advancedQueryTest.js # Advanced query tests (11 tests, 100% pass)
+├── commentTest.js     # Comment system tests (10 tests, 100% pass)
+├── attachmentTest.js  # File attachment tests (10 tests, 100% pass)
+├── epicTest.js        # Epic management tests (10 tests, 100% pass)
+├── wikiTest.js        # Wiki management tests
+└── runTests.js        # Comprehensive test runner
 ```
 
-## 🔧 开发注意事项
+## 🔧 Development Guidelines
 
-### 核心设计原则
-1. **模块化优先** - 每个功能独立模块，便于维护
-2. **错误处理统一** - 所有API调用使用统一错误处理模式
-3. **响应格式标准** - 使用`createSuccessResponse`和`createErrorResponse`
-4. **项目标识符灵活** - 支持数字ID和字符串slug
+### Core Design Principles
+1. **Modular First** - Each feature as independent module for easy maintenance
+2. **Unified Error Handling** - All API calls use unified error handling pattern
+3. **Standardized Response Format** - Use `createSuccessResponse` and `createErrorResponse`
+4. **Flexible Project Identifiers** - Support both numeric IDs and string slugs
 
-### ES模块规范
-- 所有导入必须包含`.js`扩展名
-- 使用`export`/`import`语法
-- 支持动态导入
+### ES Module Standards
+- All imports must include `.js` extension
+- Use `export`/`import` syntax
+- Support dynamic imports
 
-### 数据处理模式
+### Data Processing Patterns
 ```javascript
-// 项目解析示例
+// Project resolution example
 const project = await resolveProject(projectIdentifier);
 
-// 响应格式化示例  
+// Response formatting example  
 return createSuccessResponse(`✅ ${SUCCESS_MESSAGES.ISSUE_CREATED}`);
 
-// 错误处理示例
+// Error handling example
 return createErrorResponse(ERROR_MESSAGES.PROJECT_NOT_FOUND);
 ```
 
-### 常用工具函数
-- `resolveProject()` - 智能项目解析（ID/slug/名称）
-- `formatDate()` - 统一日期格式化
-- `calculateCompletionPercentage()` - 完成度计算
-- `createSuccessResponse()` / `createErrorResponse()` - 响应格式化
+### Common Utility Functions
+- `resolveProject()` - Smart project resolution (ID/slug/name)
+- `formatDate()` - Unified date formatting
+- `calculateCompletionPercentage()` - Completion percentage calculation
+- `createSuccessResponse()` / `createErrorResponse()` - Response formatting
 
-## 📊 代码质量指标
+## 📊 Code Quality Metrics
 
-### 模块化程度
-- **主文件缩减**: 800+ 行 → 130 行 (83%减少)
-- **功能分离**: 6个独立工具模块
-- **测试覆盖**: 4个测试层级
-- **文档化**: 完整API和架构文档
+### Modularization Level
+- **Main File Reduction**: 800+ lines → 130 lines (83% reduction)
+- **Feature Separation**: 12 independent tool modules
+- **Test Coverage**: 4 testing levels
+- **Documentation**: Complete API and architecture documentation
 
-### 开发工作流
-1. **快速验证**: `npm test` (单元+快速测试)
-2. **功能开发**: 修改对应工具模块
-3. **完整测试**: `npm run test:full`
-4. **自动发布**: `npm version patch && git push origin main --tags`
+### Development Workflow
+1. **Quick Validation**: `npm test` (unit + quick tests)
+2. **Feature Development**: Modify corresponding tool modules
+3. **Complete Testing**: `npm run test:full`
+4. **Automated Publishing**: `npm version patch && git push origin main --tags`
 
-### CI/CD自动化流程 🚀
-项目配置了完整的GitHub Actions自动化发布流程：
+### CI/CD Automation Pipeline 🚀
+The project is configured with complete GitHub Actions automated publishing workflow:
 
-**触发条件**: 推送 `v*` 标签
+**Trigger Condition**: Push `v*` tags
 ```bash
-npm version patch              # 自动创建新版本标签
-git push origin main --tags    # 推送触发CI/CD
+npm version patch              # Automatically create new version tag
+git push origin main --tags    # Push to trigger CI/CD
 ```
 
-**自动化流程**:
-1. **🧪 测试阶段** - 运行单元测试和快速测试
-2. **📦 并行发布**:
+**Automation Flow**:
+1. **🧪 Testing Phase** - Run unit tests and quick tests
+2. **📦 Parallel Publishing**:
    - NPM Registry: `taiga-mcp-server`
    - GitHub Packages: `@greddy7574/taiga-mcp-server`
-3. **🎉 Release创建** - 自动生成changelog和发布说明
+3. **🎉 Release Creation** - Auto-generate changelog and release notes
 
-**配置要求**:
-- GitHub Repository Secret: `NPM_TOKEN` (npm自动化token)
-- 权限: `contents: write`, `packages: write`
+**Configuration Requirements**:
+- GitHub Repository Secret: `NPM_TOKEN` (npm automation token)
+- Permissions: `contents: write`, `packages: write`
 
-**完整流程耗时**: ~45秒 (测试→发布→Release)
+**Complete Flow Duration**: ~45 seconds (Testing→Publishing→Release)
 
-## 🎯 常见开发任务
+## 🎯 Common Development Tasks
 
-### 添加新工具
-1. 在`src/tools/`创建工具文件
-2. 在`src/tools/index.js`注册工具
-3. 在`src/constants.js`添加相关常量
-4. 添加对应测试用例
+### Adding New Tools
+1. Create tool file in `src/tools/`
+2. Register tool in `src/tools/index.js`
+3. Add related constants in `src/constants.js`
+4. Add corresponding test cases
 
-### 修改API响应
-1. 检查`src/taigaService.js`中的API调用
-2. 使用`src/utils.js`中的格式化函数
-3. 确保错误处理一致性
+### Modifying API Responses
+1. Check API calls in `src/taigaService.js`
+2. Use formatting functions from `src/utils.js`
+3. Ensure error handling consistency
 
-### 调试问题
-1. 运行`npm run test:unit`验证核心逻辑
-2. 运行`npm run test:quick`验证MCP功能
-3. 检查`.env`文件配置
-4. 查看`test/README.md`了解测试策略
+### Debugging Issues
+1. Run `npm run test:unit` to verify core logic
+2. Run `npm run test:quick` to verify MCP functionality
+3. Check `.env` file configuration
+4. See `test/README.md` for testing strategy
 
-## 🚀 项目发展历程
+## 🚀 Project Development History
 
-### 版本历史
-- **v1.0.0**: 基础MCP功能
-- **v1.3.0**: 添加constants和utils模块
-- **v1.4.0**: 增强常量管理，统一命名
-- **v1.5.0**: 完全模块化架构
-- **v1.5.1**: 清理和测试框架
-- **v1.5.2**: 清理git历史，完整npm发布
-- **v1.5.3**: CI/CD基础框架
-- **v1.5.4**: 修复CI/CD流程
-- **v1.5.5**: 双重发布支持(NPM+GPR)
-- **v1.5.6**: 完全自动化Release创建
-- **v1.6.0**: Docker容器化部署和批次操作
-- **v1.6.1**: 高级查询语法系统
-- **v1.7.0**: 评论系统协作增强
-- **v1.9.8**: Base64文件上传架构重构，解决MCP协议文件处理限制
+### Version History
+- **v1.0.0**: Basic MCP functionality
+- **v1.3.0**: Added constants and utils modules
+- **v1.4.0**: Enhanced constant management, unified naming
+- **v1.5.0**: Complete modular architecture
+- **v1.5.1**: Cleanup and testing framework
+- **v1.5.2**: Git history cleanup, complete npm publishing
+- **v1.5.3**: CI/CD foundation framework
+- **v1.5.4**: CI/CD workflow fixes
+- **v1.5.5**: Dual publishing support (NPM+GPR)
+- **v1.5.6**: Fully automated Release creation
+- **v1.6.0**: Docker containerization deployment and batch operations
+- **v1.6.1**: Advanced query syntax system
+- **v1.7.0**: Comment system collaboration enhancement
+- **v1.8.0**: Epic management enterprise features
+- **v1.9.8**: Base64 file upload architecture refactor, solving MCP protocol file handling limitations
+- **v1.9.14**: Current version with all features integrated
 
-### AI协作开发特色
-这个项目展示了人机协作开发的强大潜力：
-- **架构设计**: AI辅助的模块化设计
-- **代码重构**: 从单文件到模块化的完整重构
-- **测试框架**: 多层次测试策略设计
-- **文档完善**: 专业级文档和指南
+### AI-Assisted Development Features
+This project demonstrates the powerful potential of human-AI collaborative development:
+- **Architecture Design**: AI-assisted modular design
+- **Code Refactoring**: Complete refactoring from single file to modular architecture
+- **Testing Framework**: Multi-level testing strategy design
+- **Documentation Excellence**: Professional-grade documentation and guides
 
-项目是"inspired by"开源项目的成功案例，展现了如何在保持法律合规的同时进行大幅创新和改进。
+This project is a successful case study of "inspired by" open source development, showing how to achieve significant innovation and improvement while maintaining legal compliance.
 
-## 📚 扩展文档
+## 📚 Extended Documentation
 
-**完整的技术文档和用户指南请访问项目 Wiki:**
+**Complete technical documentation and user guides are available on the project Wiki:**
 👉 **https://github.com/greddy7574/taigaMcpServer/wiki**
 
-### Wiki 亮点功能
-- 🔍 **全文搜索** - 快速查找特定内容
-- 📱 **移动优化** - 更好的移动设备体验  
-- 🔗 **智能导航** - 页面间快速跳转
-- 📖 **在线编辑** - 协作编辑文档
-- 📊 **富媒体支持** - 图表、表格、代码高亮
+### Wiki Highlight Features
+- 🔍 **Full-text Search** - Quickly find specific content
+- 📱 **Mobile Optimized** - Better mobile device experience  
+- 🔗 **Smart Navigation** - Quick jumps between pages
+- 📖 **Online Editing** - Collaborative document editing
+- 📊 **Rich Media Support** - Charts, tables, code highlighting
 
-### 推荐阅读顺序
-1. [Installation Guide](https://github.com/greddy7574/taigaMcpServer/wiki/Installation-Guide) - 新用户必读
-2. [API Reference](https://github.com/greddy7574/taigaMcpServer/wiki/API-Reference) - 完整API文档
-3. [CICD Automation](https://github.com/greddy7574/taigaMcpServer/wiki/CICD-Automation) - 自动化发布流程
+### Recommended Reading Order
+1. [Installation Guide](https://github.com/greddy7574/taigaMcpServer/wiki/Installation-Guide) - Essential for new users
+2. [API Reference](https://github.com/greddy7574/taigaMcpServer/wiki/API-Reference) - Complete API documentation
+3. [CICD Automation](https://github.com/greddy7574/taigaMcpServer/wiki/CICD-Automation) - Automated publishing workflow
