@@ -118,6 +118,88 @@ export class TaigaService {
   }
 
   /**
+   * Get details of a specific user story
+   * @param {string} userStoryId - User Story ID
+   * @returns {Promise<Object>} - User story details
+   */
+  async getUserStory(userStoryId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const url = `${API_ENDPOINTS.USER_STORIES}/${userStoryId}`;
+      const response = await client.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get user story:', error.message);
+      throw new Error(ERROR_MESSAGES.USER_STORY_NOT_FOUND);
+    }
+  }
+
+  /**
+   * Get user story by reference number
+   * @param {string} ref - User story reference number
+   * @param {string} projectId - Project ID  
+   * @returns {Promise<Object>} - User story details
+   */
+  async getUserStoryByRef(ref, projectId) {
+    try {
+      const client = await createAuthenticatedClient();
+      const url = `${API_ENDPOINTS.USER_STORIES}/by_ref`;
+      const params = { ref, project: projectId };
+      const response = await client.get(url, { params });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get user story by reference:', error.message);
+      throw new Error(ERROR_MESSAGES.USER_STORY_NOT_FOUND);
+    }
+  }
+
+  /**
+   * Update a user story
+   * @param {number} userStoryId - User Story ID
+   * @param {Object} updateData - Data to update
+   * @returns {Promise<Object>} - Updated user story
+   */
+  async updateUserStory(userStoryId, updateData) {
+    try {
+      const client = await createAuthenticatedClient();
+      
+      // Get current user story to get version for update
+      const currentStory = await client.get(`${API_ENDPOINTS.USER_STORIES}/${userStoryId}`);
+      const dataWithVersion = {
+        ...updateData,
+        version: currentStory.data.version
+      };
+
+      const response = await client.patch(`${API_ENDPOINTS.USER_STORIES}/${userStoryId}`, dataWithVersion);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update user story:', error.message);
+      throw new Error('Failed to update user story in Taiga');
+    }
+  }
+
+  /**
+   * Delete a user story
+   * @param {number} userStoryId - User Story ID
+   * @returns {Promise<void>} - Success confirmation
+   */
+  async deleteUserStory(userStoryId) {
+    try {
+      const client = await createAuthenticatedClient();
+      
+      // Get current user story to get version for deletion
+      const currentStory = await client.get(`${API_ENDPOINTS.USER_STORIES}/${userStoryId}`);
+      
+      await client.delete(`${API_ENDPOINTS.USER_STORIES}/${userStoryId}`, {
+        data: { version: currentStory.data.version }
+      });
+    } catch (error) {
+      console.error('Failed to delete user story:', error.message);
+      throw new Error('Failed to delete user story from Taiga');
+    }
+  }
+
+  /**
    * Get user story statuses for a project
    * @param {string} projectId - Project ID
    * @returns {Promise<Array>} - List of user story statuses
@@ -1052,7 +1134,8 @@ export class TaigaService {
       return response.data;
     } catch (error) {
       console.error('Failed to link story to epic:', error.message);
-      throw new Error('Failed to link user story to epic');
+      console.error('Error details:', error.response?.data || error);
+      throw new Error(`Failed to link user story to epic: ${error.message}`);
     }
   }
 

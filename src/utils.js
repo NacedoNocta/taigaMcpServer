@@ -66,6 +66,51 @@ export async function resolveIssue(issueIdentifier, projectIdentifier) {
 }
 
 /**
+ * Resolve user story identifier to user story object
+ * Handles direct IDs and reference numbers (with # prefix)
+ * @param {string} userStoryIdentifier - User story ID or reference number
+ * @param {string} [projectIdentifier] - Project ID or slug (required for reference numbers)
+ * @returns {Promise<Object>} - User story object
+ */
+export async function resolveUserStory(userStoryIdentifier, projectIdentifier) {
+  // Handle #-prefixed reference numbers
+  if (userStoryIdentifier.startsWith('#')) {
+    if (!projectIdentifier) {
+      throw new Error('Project identifier is required when using user story reference number');
+    }
+    
+    const projectId = await resolveProjectId(projectIdentifier);
+    const ref = userStoryIdentifier.substring(1);
+    return await taigaService.getUserStoryByRef(ref, projectId);
+  }
+  
+  // For pure numbers, try both approaches: first as ID, then as reference number
+  if (/^\d+$/.test(userStoryIdentifier)) {
+    // First try as direct User Story ID
+    try {
+      return await taigaService.getUserStory(userStoryIdentifier);
+    } catch (error) {
+      // If that fails and we have a project identifier, try as reference number
+      if (projectIdentifier) {
+        try {
+          const projectId = await resolveProjectId(projectIdentifier);
+          return await taigaService.getUserStoryByRef(userStoryIdentifier, projectId);
+        } catch (refError) {
+          // If both fail, throw a more helpful error
+          throw new Error(`User story not found by ID "${userStoryIdentifier}" or reference number "#${userStoryIdentifier}" in project. Original errors: ID lookup: ${error.message}, Ref lookup: ${refError.message}`);
+        }
+      } else {
+        // No project identifier available, can only try ID
+        throw new Error(`User story ID "${userStoryIdentifier}" not found. If this is a reference number, please provide projectIdentifier or use "#${userStoryIdentifier}" format.`);
+      }
+    }
+  }
+  
+  // For non-numeric strings, treat as direct ID
+  return await taigaService.getUserStory(userStoryIdentifier);
+}
+
+/**
  * Find status ID by name
  * @param {Array} statuses - Array of status objects
  * @param {string} statusName - Status name to find

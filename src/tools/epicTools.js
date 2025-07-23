@@ -5,7 +5,7 @@
 
 import { z } from 'zod';
 import { TaigaService } from '../taigaService.js';
-import { createSuccessResponse, createErrorResponse } from '../utils.js';
+import { createSuccessResponse, createErrorResponse, resolveProjectId } from '../utils.js';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants.js';
 
 const taigaService = new TaigaService();
@@ -17,24 +17,23 @@ const taigaService = new TaigaService();
 export const createEpicTool = {
   name: 'createEpic',
   description: 'Create a new Epic for organizing large-scale project features',
-  inputSchema: z.object({
-    project: z.number({
-      description: 'Project ID where the Epic will be created'
-    }),
+  schema: {
+    projectIdentifier: z.string().describe('Project ID or slug'),
     subject: z.string().min(1, 'Epic subject is required'),
     description: z.string().optional().describe('Optional detailed description of the Epic'),
     color: z.string().optional().describe('Optional color code for the Epic (e.g., #FF5733)'),
     tags: z.array(z.string()).optional().describe('Optional tags for categorization'),
-  }),
+  },
   
-  handler: async ({ project, subject, description, color, tags }) => {
+  handler: async ({ projectIdentifier, subject, description, color, tags }) => {
     try {
       if (!taigaService.isAuthenticated()) {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
       }
 
+      const projectId = await resolveProjectId(projectIdentifier);
       const epicData = {
-        project,
+        project: projectId,
         subject,
         description: description || '',
         color: color || '#999999',
@@ -48,7 +47,7 @@ export const createEpicTool = {
         `🏛️ **Epic創建成功**\n` +
         `- Epic ID: ${result.id}\n` +
         `- 標題: ${result.subject}\n` +
-        `- 專案: ${result.project_extra_info?.name || project}\n` +
+        `- 專案: ${result.project_extra_info?.name || projectId}\n` +
         `- 顏色: ${result.color}\n` +
         `- 創建時間: ${new Date(result.created_date).toLocaleString()}\n` +
         `${result.description ? `- 描述: ${result.description}\n` : ''}` +
@@ -68,23 +67,22 @@ export const createEpicTool = {
 export const listEpicsTool = {
   name: 'listEpics',
   description: 'List all Epics in a project',
-  inputSchema: z.object({
-    project: z.number({
-      description: 'Project ID to list Epics from'
-    })
-  }),
+  schema: {
+    projectIdentifier: z.string().describe('Project ID or slug'),
+  },
   
-  handler: async ({ project }) => {
+  handler: async ({ projectIdentifier }) => {
     try {
       if (!taigaService.isAuthenticated()) {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
       }
 
-      const epics = await taigaService.listEpics(project);
+      const projectId = await resolveProjectId(projectIdentifier);
+      const epics = await taigaService.listEpics(projectId);
       
       if (epics.length === 0) {
         return createSuccessResponse(
-          `🏛️ **專案 #${project} Epic列表**\n\n` +
+          `🏛️ **專案 #${projectId} Epic列表**\n\n` +
           `暫無Epic`
         );
       }
@@ -106,7 +104,7 @@ export const listEpicsTool = {
       }).join('\n');
 
       return createSuccessResponse(
-        `🏛️ **專案 #${project} Epic列表** (共 ${epics.length} 個)\n\n` +
+        `🏛️ **專案 #${projectId} Epic列表** (共 ${epics.length} 個)\n\n` +
         epicList
       );
     } catch (error) {
@@ -123,11 +121,9 @@ export const listEpicsTool = {
 export const getEpicTool = {
   name: 'getEpic',
   description: 'Get detailed information about a specific Epic',
-  inputSchema: z.object({
-    epicId: z.number({
-      description: 'ID of the Epic to get details for'
-    })
-  }),
+  schema: {
+    epicId: z.string().describe('Epic ID'),
+  },
   
   handler: async ({ epicId }) => {
     try {
@@ -135,7 +131,14 @@ export const getEpicTool = {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
       }
 
-      const epic = await taigaService.getEpic(epicId);
+      // Convert string ID to number for API compatibility
+      const epicIdNum = parseInt(epicId, 10);
+      
+      if (isNaN(epicIdNum)) {
+        return createErrorResponse('Invalid ID format. Epic ID must be numeric.');
+      }
+
+      const epic = await taigaService.getEpic(epicIdNum);
       
       const createdDate = new Date(epic.created_date).toLocaleString();
       const modifiedDate = new Date(epic.modified_date).toLocaleString();
@@ -178,21 +181,26 @@ export const getEpicTool = {
 export const updateEpicTool = {
   name: 'updateEpic',
   description: 'Update an existing Epic\'s information',
-  inputSchema: z.object({
-    epicId: z.number({
-      description: 'ID of the Epic to update'
-    }),
+  schema: {
+    epicId: z.string().describe('Epic ID'),
     subject: z.string().optional().describe('New subject/title for the Epic'),
     description: z.string().optional().describe('New description for the Epic'),
     color: z.string().optional().describe('New color code for the Epic'),
     tags: z.array(z.string()).optional().describe('New tags for the Epic'),
     status: z.number().optional().describe('New status ID for the Epic')
-  }),
+  },
   
   handler: async ({ epicId, subject, description, color, tags, status }) => {
     try {
       if (!taigaService.isAuthenticated()) {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
+      }
+
+      // Convert string ID to number for API compatibility
+      const epicIdNum = parseInt(epicId, 10);
+      
+      if (isNaN(epicIdNum)) {
+        return createErrorResponse('Invalid ID format. Epic ID must be numeric.');
       }
 
       const updateData = {};
@@ -202,7 +210,7 @@ export const updateEpicTool = {
       if (tags !== undefined) updateData.tags = tags;
       if (status !== undefined) updateData.status = status;
 
-      const result = await taigaService.updateEpic(epicId, updateData);
+      const result = await taigaService.updateEpic(epicIdNum, updateData);
       
       return createSuccessResponse(
         `${SUCCESS_MESSAGES.EPIC_UPDATED}\n\n` +
@@ -230,14 +238,10 @@ export const updateEpicTool = {
 export const linkStoryToEpicTool = {
   name: 'linkStoryToEpic',
   description: 'Link a User Story to an Epic for better organization',
-  inputSchema: z.object({
-    userStoryId: z.number({
-      description: 'ID of the User Story to link'
-    }),
-    epicId: z.number({
-      description: 'ID of the Epic to link the story to'
-    })
-  }),
+  schema: {
+    userStoryId: z.string().describe('User Story ID'),
+    epicId: z.string().describe('Epic ID'),
+  },
   
   handler: async ({ userStoryId, epicId }) => {
     try {
@@ -245,7 +249,28 @@ export const linkStoryToEpicTool = {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
       }
 
-      const result = await taigaService.linkStoryToEpic(userStoryId, epicId);
+      // Convert string IDs to numbers for API compatibility
+      const userStoryIdNum = parseInt(userStoryId, 10);
+      const epicIdNum = parseInt(epicId, 10);
+      
+      if (isNaN(userStoryIdNum) || isNaN(epicIdNum)) {
+        return createErrorResponse('Invalid ID format. Both User Story ID and Epic ID must be numeric.');
+      }
+
+      // Verify that both the user story and epic exist
+      try {
+        await taigaService.getUserStory(userStoryIdNum);
+      } catch (error) {
+        return createErrorResponse(`User Story #${userStoryId} not found: ${error.message}`);
+      }
+
+      try {
+        await taigaService.getEpic(epicIdNum);
+      } catch (error) {
+        return createErrorResponse(`Epic #${epicId} not found: ${error.message}`);
+      }
+
+      const result = await taigaService.linkStoryToEpic(userStoryIdNum, epicIdNum);
       
       return createSuccessResponse(
         `${SUCCESS_MESSAGES.STORY_LINKED_TO_EPIC}\n\n` +
@@ -260,7 +285,7 @@ export const linkStoryToEpicTool = {
       if (error.response?.status === 404) {
         return createErrorResponse(ERROR_MESSAGES.USER_STORY_NOT_FOUND);
       }
-      return createErrorResponse(ERROR_MESSAGES.FAILED_TO_LINK_STORY);
+      return createErrorResponse(`${ERROR_MESSAGES.FAILED_TO_LINK_STORY}: ${error.message}`);
     }
   }
 };
@@ -272,11 +297,9 @@ export const linkStoryToEpicTool = {
 export const unlinkStoryFromEpicTool = {
   name: 'unlinkStoryFromEpic',
   description: 'Remove the link between a User Story and Epic',
-  inputSchema: z.object({
-    userStoryId: z.number({
-      description: 'ID of the User Story to unlink'
-    })
-  }),
+  schema: {
+    userStoryId: z.string().describe('User Story ID'),
+  },
   
   handler: async ({ userStoryId }) => {
     try {
@@ -284,7 +307,14 @@ export const unlinkStoryFromEpicTool = {
         return createErrorResponse(ERROR_MESSAGES.AUTHENTICATION_FAILED);
       }
 
-      const result = await taigaService.unlinkStoryFromEpic(userStoryId);
+      // Convert string ID to number for API compatibility
+      const userStoryIdNum = parseInt(userStoryId, 10);
+      
+      if (isNaN(userStoryIdNum)) {
+        return createErrorResponse('Invalid ID format. User Story ID must be numeric.');
+      }
+
+      const result = await taigaService.unlinkStoryFromEpic(userStoryIdNum);
       
       return createSuccessResponse(
         `${SUCCESS_MESSAGES.STORY_UNLINKED_FROM_EPIC}\n\n` +

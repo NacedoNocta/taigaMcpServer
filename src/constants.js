@@ -65,6 +65,8 @@ export const ERROR_MESSAGES = {
 export const SUCCESS_MESSAGES = {
   AUTHENTICATED: 'Successfully authenticated',
   USER_STORY_CREATED: 'User story created successfully!',
+  USER_STORY_UPDATED: 'User story updated successfully!',
+  USER_STORY_DELETED: 'User story deleted successfully!',
   TASK_CREATED: 'Task created successfully!',
   ISSUE_CREATED: 'Issue created successfully!',
   SPRINT_CREATED: 'Sprint created successfully!',
