@@ -1,3 +1,5 @@
+# Forked for addtionnal functionnalities and and tools for non-batch User-Story management.
+
 # 🚀 Taiga MCP Server
 
 A powerful **Model Context Protocol (MCP)** server that enables natural language interaction with **Taiga project management** systems. Seamlessly manage your projects, sprints, user stories, tasks, and issues through conversational AI.
